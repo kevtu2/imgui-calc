@@ -4,24 +4,23 @@ project "Calculator"
     cppdialect "C++20"
     staticruntime "on"
 
-targetdir("../bin/" .. outputdir .. "/%{prj.name}")
-objdir("../binint/" .. outputdir .. "/%{prj.name}")
+    targetdir("../bin/" .. outputdir .. "/%{prj.name}")
+    objdir("../binint/" .. outputdir .. "/%{prj.name}")
 
-files {
-    "include/**.h",
-    "src/**.cpp"
-}
+    files {
+        "include/**.h",
+        "src/**.cpp"
+    }
 
-includedirs { "include" }
-defines {  }
+    includedirs { "include" }
 
-filter { "configurations:Debug" }
-    buildoptions "/MTd" -- Multi threaded debug DLL runtime library
-    runtime "Debug"
-    symbols "on"
+    filter { "configurations:Debug" }
+        buildoptions "/MTd" -- Multi threaded debug DLL runtime library
+        runtime "Debug"
+        symbols "on"
 
-filter { "configurations:Release" }
-    buildoptions "/MT"
-    runtime "Release"
-    symbols "off"
-    optimize "on"
+    filter { "configurations:Release" }
+        buildoptions "/MT"
+        runtime "Release"
+        symbols "off"
+        optimize "on"

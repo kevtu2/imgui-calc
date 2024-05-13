@@ -9,11 +9,11 @@ workspace "Calculator"
     }
     filter { "platforms:Win32" }
         system "Windows"
-        architecture "x86_64"
+        architecture "x86"
     
     filter { "platforms:Win64" }
         system "Windows"
-        architecture "x64"
+        architecture "x86_64"
     
     startproject "Calculator"
 
