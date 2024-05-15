@@ -15,7 +15,8 @@ workspace "Calculator"
         system "Windows"
         architecture "x86_64"
     
-    startproject "Calculator"
+
+startproject "Calculator"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}" -- Global output dir name variable
 
@@ -34,7 +35,7 @@ newaction {
         print("Done.")
         print("Removing project files..")
         os.rmdir("./.vs") -- This is a visual studio directory
-        os.remove("**.sln")
+        os.remove("Calculator.sln")
         os.remove("**.vcxproj")
         os.remove("**.vcxproj.filters")
         os.remove("**.vcxproj.user")

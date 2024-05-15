@@ -1,5 +1,5 @@
 project "CalcGUI"
-    kind "WindowedApp"
+    kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     staticruntime "on"
@@ -12,11 +12,14 @@ project "CalcGUI"
         "src/**.cpp",
         "vendor/imgui/*.cpp",
         "vendor/imgui/*.h",
-        "vendor/imgui/backends/imgui_impl_opengl3.h",
-        "vendor/imgui/backends/imgui_impl_opengl3.cpp",
+        "vendor/imgui/backends/imgui_impl_dx11.h",
+        "vendor/imgui/backends/imgui_impl_dx11.cpp",
+        "vendor/imgui/backends/imgui_impl_win32.cpp",
+        "vendor/imgui/backends/imgui_impl_win32.h",
         "vendor/imgui/misc/debuggers/imgui.natvis",
         "vendor/imgui/misc/debuggers/imgui.natstepfilter",
-        "vendor/imgui/misc/cpp/imgui_stdlib.*"
+        "vendor/imgui/misc/cpp/imgui_stdlib.*",
+
     }
 
     includedirs {
@@ -24,6 +27,12 @@ project "CalcGUI"
         "vendor/imgui",
         "vendor/imgui/backends",
         "vendor/imgui/misc/cpp/",
+    }
+
+    links { 
+        "d3d11",
+        "dxgi",
+        "d3dcompiler"
     }
 
     filter { "configurations:Debug" }
