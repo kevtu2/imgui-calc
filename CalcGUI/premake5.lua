@@ -4,8 +4,8 @@ project "CalcGUI"
     cppdialect "C++20"
     staticruntime "on"
 
-    targetdir("../bin/" .. outputdir .. "/%{prj.name}")
-    objdir("../binint/" .. outputdir .. "/%{prj.name}")
+    targetdir("../bin" .. outputdir .. "/%{prj.name}")
+    objdir("../binint" .. outputdir .. "/%{prj.name}")
 
     files {
         "include/**.h",

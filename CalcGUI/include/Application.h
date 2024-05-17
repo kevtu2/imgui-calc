@@ -1,7 +1,8 @@
 #pragma once
 
-namespace MyApp {
+namespace MyGUI {
 
-	void RenderUI();
+	void RenderMain(float, float);
+	void RenderInfo(float, float);
 
 }
