@@ -1,3 +1,7 @@
 reference/
 .vs/
 Calculator.sln
+bin/
+binint/
+CalcGUI/CalcGUI.vcxproj.*
+Calculator/Calculator.vcxproj.*

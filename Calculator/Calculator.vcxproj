@@ -82,26 +82,26 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\binDebug-windows-x86\Calculator\</OutDir>
-    <IntDir>..\binintDebug-windows-x86\Calculator\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86\Calculator\</OutDir>
+    <IntDir>..\binint\Debug-windows-x86\Calculator\</IntDir>
     <TargetName>Calculator</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">
-    <OutDir>..\binDebug-windows-x86_64\Calculator\</OutDir>
-    <IntDir>..\binintDebug-windows-x86_64\Calculator\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86_64\Calculator\</OutDir>
+    <IntDir>..\binint\Debug-windows-x86_64\Calculator\</IntDir>
     <TargetName>Calculator</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\binRelease-windows-x86\Calculator\</OutDir>
-    <IntDir>..\binintRelease-windows-x86\Calculator\</IntDir>
+    <OutDir>..\bin\Release-windows-x86\Calculator\</OutDir>
+    <IntDir>..\binint\Release-windows-x86\Calculator\</IntDir>
     <TargetName>Calculator</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">
-    <OutDir>..\binRelease-windows-x86_64\Calculator\</OutDir>
-    <IntDir>..\binintRelease-windows-x86_64\Calculator\</IntDir>
+    <OutDir>..\bin\Release-windows-x86_64\Calculator\</OutDir>
+    <IntDir>..\binint\Release-windows-x86_64\Calculator\</IntDir>
     <TargetName>Calculator</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>

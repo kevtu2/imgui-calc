@@ -1,4 +1,4 @@
-// Dear ImGui: standalone template application for DirectX 11
+// Dear ImGui: standalone example application for DirectX 11
 
 // Learn about Dear ImGui:
 // - FAQ                  https://dearimgui.com/faq
@@ -14,11 +14,11 @@
 #include "Application.h"
 
 // Data
-static ID3D11Device*            g_pd3dDevice = nullptr;
-static ID3D11DeviceContext*     g_pd3dDeviceContext = nullptr;
-static IDXGISwapChain*          g_pSwapChain = nullptr;
+static ID3D11Device* g_pd3dDevice = nullptr;
+static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
+static IDXGISwapChain* g_pSwapChain = nullptr;
 static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
-static ID3D11RenderTargetView*  g_mainRenderTargetView = nullptr;
+static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
@@ -34,7 +34,7 @@ int main(int, char**)
     //ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Calculator", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Calculator v1.0.1", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))
@@ -54,27 +54,10 @@ int main(int, char**)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-    //io.ConfigViewportsNoAutoMerge = true;
-    //io.ConfigViewportsNoTaskBarIcon = true;
-    //io.ConfigViewportsNoDefaultParent = true;
-    //io.ConfigDockingAlwaysTabBar = true;
-    //io.ConfigDockingTransparentPayload = true;
-    //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-    //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
-
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
@@ -132,10 +115,9 @@ int main(int, char**)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        // *** MY CUSTOM CODE ***
-        const ImGuiViewport *main_viewport = ImGui::GetMainViewport();
+        // *** MY CODE ***
+        const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         MyGUI::RenderInfo(main_viewport->WorkPos.x, main_viewport->WorkPos.y);
-
 
         // Rendering
         ImGui::Render();
@@ -143,13 +125,6 @@ int main(int, char**)
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
         g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        // Update and Render additional Platform Windows
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
 
         g_pSwapChain->Present(1, 0); // Present with vsync
         //g_pSwapChain->Present(0, 0); // Present without vsync
@@ -168,6 +143,7 @@ int main(int, char**)
 }
 
 // Helper functions
+
 bool CreateDeviceD3D(HWND hWnd)
 {
     // Setup swap chain
@@ -222,10 +198,6 @@ void CleanupRenderTarget()
     if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = nullptr; }
 }
 
-#ifndef WM_DPICHANGED
-#define WM_DPICHANGED 0x02E0 // From Windows SDK 8.1+ headers
-#endif
-
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -254,15 +226,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         ::PostQuitMessage(0);
         return 0;
-    case WM_DPICHANGED:
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DpiEnableScaleViewports)
-        {
-            //const int dpi = HIWORD(wParam);
-            //printf("WM_DPICHANGED to %d (%.0f%%)\n", dpi, (float)dpi / 96.0f * 100.0f);
-            const RECT* suggested_rect = (RECT*)lParam;
-            ::SetWindowPos(hWnd, nullptr, suggested_rect->left, suggested_rect->top, suggested_rect->right - suggested_rect->left, suggested_rect->bottom - suggested_rect->top, SWP_NOZORDER | SWP_NOACTIVATE);
-        }
-        break;
     }
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }

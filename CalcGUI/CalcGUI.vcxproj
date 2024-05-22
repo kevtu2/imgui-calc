@@ -83,29 +83,29 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\binDebug-windows-x86\CalcGUI\</OutDir>
-    <IntDir>..\binintDebug-windows-x86\CalcGUI\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86\CalcGUI\</OutDir>
+    <IntDir>..\binint\Debug-windows-x86\CalcGUI\</IntDir>
     <TargetName>CalcGUI</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\binDebug-windows-x86_64\CalcGUI\</OutDir>
-    <IntDir>..\binintDebug-windows-x86_64\CalcGUI\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86_64\CalcGUI\</OutDir>
+    <IntDir>..\binint\Debug-windows-x86_64\CalcGUI\</IntDir>
     <TargetName>CalcGUI</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\binRelease-windows-x86\CalcGUI\</OutDir>
-    <IntDir>..\binintRelease-windows-x86\CalcGUI\</IntDir>
+    <OutDir>..\bin\Release-windows-x86\CalcGUI\</OutDir>
+    <IntDir>..\binint\Release-windows-x86\CalcGUI\</IntDir>
     <TargetName>CalcGUI</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\binRelease-windows-x86_64\CalcGUI\</OutDir>
-    <IntDir>..\binintRelease-windows-x86_64\CalcGUI\</IntDir>
+    <OutDir>..\bin\Release-windows-x86_64\CalcGUI\</OutDir>
+    <IntDir>..\binint\Release-windows-x86_64\CalcGUI\</IntDir>
     <TargetName>CalcGUI</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>

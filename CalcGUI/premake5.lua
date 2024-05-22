@@ -4,8 +4,8 @@ project "CalcGUI"
     cppdialect "C++20"
     staticruntime "on"
 
-    targetdir("../bin" .. outputdir .. "/%{prj.name}")
-    objdir("../binint" .. outputdir .. "/%{prj.name}")
+    targetdir("../bin/" .. outputdir .. "/%{prj.name}")
+    objdir("../binint/" .. outputdir .. "/%{prj.name}")
 
     files {
         "include/**.h",
@@ -19,7 +19,6 @@ project "CalcGUI"
         "vendor/imgui/misc/debuggers/imgui.natvis",
         "vendor/imgui/misc/debuggers/imgui.natstepfilter",
         "vendor/imgui/misc/cpp/imgui_stdlib.*",
-
     }
 
     includedirs {
