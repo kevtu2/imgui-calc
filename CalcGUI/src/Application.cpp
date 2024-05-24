@@ -1,15 +1,21 @@
-#include "Application.h"
+﻿#include "Application.h"
 #include "imgui.h"
 #include <cstring>
+#include <iostream>
 
 namespace MyGUI {
 	static bool startCalc = false;
 
-	void RenderMain(float workPosx, float workPosy) {
+	void RenderMain(float workPosx, float workPosy, ImGuiIO& io) {
 
 		// Calculator window dimensions
-		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280-500), (workPosy + 50)), ImGuiCond_FirstUseEver);
-		ImGui::SetNextWindowSize(ImVec2(400, 650), ImGuiCond_FirstUseEver); // W,H
+		//ImFont* titleFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 18.0f); // Title font
+		//ImFont* bodyFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 36.0f); // Body font
+		//ImGui::PushFont(titleFont); // Push title font to use
+		// TODO: Figure out how to change font locally 
+
+		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280-500), (workPosy + 50)), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(424, 632), ImGuiCond_Always); // W,H
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove;
 		windowFlags |= ImGuiWindowFlags_NoCollapse;
@@ -17,6 +23,8 @@ namespace MyGUI {
 
 		// Make calculator window
 		if (ImGui::Begin("Calculator", &startCalc, windowFlags)) {
+			//ImGui::PopFont(); // Pop title font
+			//ImGui::PushFont(bodyFont); // Use body font
 
 			// Tool tip - Calculator description
 			ImGui::TextDisabled("(?)");
@@ -29,21 +37,53 @@ namespace MyGUI {
 			}
 
 			// Calculator input box
-			static char input[256] = "";
+			static char input[55] = "";
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
 
-			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(385, 100), inputFlags);
-			//if (sizeof(input) == 54) strcat_s(input, "\n"); TODO: Fix new line problem after 54 characters!
-			if (ImGui::Button("7", ImVec2(100,80))) strcat_s(input, "7"); ImGui::SameLine();
-			if (ImGui::Button("8", ImVec2(100,80))) strcat_s(input, "8"); ImGui::SameLine();
-			if (ImGui::Button("9", ImVec2(100,80))) strcat_s(input, "9"); ImGui::SameLine();
+			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(408, 100), inputFlags);
+			ImGui::Spacing();
+
+			ImGui::BeginDisabled(strlen(input) == 54); // Disable buttons after max chars.
+
+			// LAYOUT TO USE:
+			/*const char* buttons[6][4] = {
+				{"cos","sin", "tan","del"},
+				{"pow","sqr","sqrt","/"  },
+				{"7",  "8",  "9",   "*"	 },
+				{"4",  "5",  "6",   "-"	 },
+				{"1",  "2",  "3",   "+"	 },
+				{"0",  ".",  "(-)", "="	 }
+			};*/
+			
+			// Digits (GUI Template)
+			if (ImGui::Button("7", ImVec2(96,80))) strcat_s(input, "7"); ImGui::SameLine();
+			if (ImGui::Button("8", ImVec2(96,80))) strcat_s(input, "8"); ImGui::SameLine();
+			if (ImGui::Button("9", ImVec2(96,80))) strcat_s(input, "9"); ImGui::SameLine();
+			if (ImGui::Button("Del", ImVec2(96, 80)))
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			if (ImGui::Button("4", ImVec2(96,80))) strcat_s(input, "4"); ImGui::SameLine();
+			if (ImGui::Button("5", ImVec2(96,80))) strcat_s(input, "5"); ImGui::SameLine();
+			if (ImGui::Button("6", ImVec2(96,80))) strcat_s(input, "6"); ImGui::SameLine();
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			if (ImGui::Button("1", ImVec2(96,80))) strcat_s(input, "1"); ImGui::SameLine();
+			if (ImGui::Button("2", ImVec2(96,80))) strcat_s(input, "2"); ImGui::SameLine();
+			if (ImGui::Button("3", ImVec2(96,80))) strcat_s(input, "3"); ImGui::SameLine();
+
+			ImGui::EndDisabled();
+
 		}
 		ImGui::End();
 		return;
 	}
 	
-	void RenderInfo(float workPosx, float workPosy) {
+	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) {
 
 		// Information window dimensions
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 20), (workPosy + 30)), ImGuiCond_Always);
@@ -59,7 +99,7 @@ namespace MyGUI {
 			ImGui::Spacing();
 			ImGui::Checkbox("Start Calculator", &startCalc);
 			if (startCalc) {
-				RenderMain(workPosx, workPosy);
+				RenderMain(workPosx, workPosy, io);
 			}
 		}
 		ImGui::End();

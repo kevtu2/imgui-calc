@@ -57,6 +57,7 @@ int main(int, char**)
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+    ImFont* defaultFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 18.0f);
     //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
@@ -124,7 +125,7 @@ int main(int, char**)
 
         // Load main windows
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-        MyGUI::RenderInfo(main_viewport->WorkPos.x, main_viewport->WorkPos.y);
+        MyGUI::RenderInfo(main_viewport->WorkPos.x, main_viewport->WorkPos.y, io);
 
         // Rendering
         ImGui::Render();
