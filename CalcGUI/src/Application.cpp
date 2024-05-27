@@ -6,20 +6,18 @@
 namespace MyGUI {
 	static bool startCalc = false;
 
-	void RenderMain(float workPosx, float workPosy, ImGuiIO& io) {
+	void RenderMain(float workPosx, float workPosy) {
 
-		// Calculator window dimensions
-		//ImFont* titleFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 18.0f); // Title font
-		//ImFont* bodyFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 36.0f); // Body font
-		//ImGui::PushFont(titleFont); // Push title font to use
-		// TODO: Figure out how to change font locally 
+		// For styling
+		ImGuiStyle& style = ImGui::GetStyle();
 
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280-500), (workPosy + 50)), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(424, 632), ImGuiCond_Always); // W,H
+		ImGui::SetNextWindowSize(ImVec2(424, 689), ImGuiCond_Always); // W,H
 
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove;
-		windowFlags |= ImGuiWindowFlags_NoCollapse;
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
 		windowFlags |= ImGuiWindowFlags_NoResize;
+		windowFlags |= ImGuiWindowFlags_NoScrollbar;
+		windowFlags |= ImGuiWindowFlags_NoScrollWithMouse;
 
 		// Make calculator window
 		if (ImGui::Begin("Calculator", &startCalc, windowFlags)) {
@@ -37,47 +35,51 @@ namespace MyGUI {
 			}
 
 			// Calculator input box
-			static char input[55] = "";
+			static char input[256] = "";
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
 
 			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(408, 100), inputFlags);
 			ImGui::Spacing();
 
-			ImGui::BeginDisabled(strlen(input) == 54); // Disable buttons after max chars.
-
-			// LAYOUT TO USE:
-			/*const char* buttons[6][4] = {
-				{"cos","sin", "tan","del"},
-				{"pow","sqr","sqrt","/"  },
+			ImGui::BeginDisabled(strlen(input) >= 54);
+			// CALCULATOR LAYOUT:
+			const char* buttons[6][4] = {
+				{"cos","sin", "tan","Clr"},
+				{"sqr","sqrt","/",  "Del"},
 				{"7",  "8",  "9",   "*"	 },
 				{"4",  "5",  "6",   "-"	 },
 				{"1",  "2",  "3",   "+"	 },
 				{"0",  ".",  "(-)", "="	 }
-			};*/
-			
-			// Digits (GUI Template)
-			if (ImGui::Button("7", ImVec2(96,80))) strcat_s(input, "7"); ImGui::SameLine();
-			if (ImGui::Button("8", ImVec2(96,80))) strcat_s(input, "8"); ImGui::SameLine();
-			if (ImGui::Button("9", ImVec2(96,80))) strcat_s(input, "9"); ImGui::SameLine();
-			if (ImGui::Button("Del", ImVec2(96, 80)))
+			};
 
-			ImGui::Spacing();
-			ImGui::Spacing();
+			// Load buttons
+			for (int row = 0; row < 6; ++row) {
+				for (int col = 0; col < 4; ++col) {
+					{ // Specific shading for different buttons/operations
+						if (row == 0 || row == 1 || col == 3) {
+							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
+							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 
-			if (ImGui::Button("4", ImVec2(96,80))) strcat_s(input, "4"); ImGui::SameLine();
-			if (ImGui::Button("5", ImVec2(96,80))) strcat_s(input, "5"); ImGui::SameLine();
-			if (ImGui::Button("6", ImVec2(96,80))) strcat_s(input, "6"); ImGui::SameLine();
+							if (buttons[row][col] == "=") {
+								style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.85f);
+								style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+							}
+						}
+						else {
+							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
 
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			if (ImGui::Button("1", ImVec2(96,80))) strcat_s(input, "1"); ImGui::SameLine();
-			if (ImGui::Button("2", ImVec2(96,80))) strcat_s(input, "2"); ImGui::SameLine();
-			if (ImGui::Button("3", ImVec2(96,80))) strcat_s(input, "3"); ImGui::SameLine();
-
+						}
+					}
+					// Loads the actual button itself
+					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) strcat_s(input, buttons[row][col]);
+					ImGui::SameLine();
+				}
+				ImGui::Spacing();
+				ImGui::Spacing();
+			}
 			ImGui::EndDisabled();
-
 		}
 		ImGui::End();
 		return;
@@ -87,7 +89,7 @@ namespace MyGUI {
 
 		// Information window dimensions
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 20), (workPosy + 30)), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(350, 150), ImGuiCond_Always);
+		ImGui::SetNextWindowSize(ImVec2(360, 140), ImGuiCond_Always);
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoResize;
 
@@ -95,11 +97,13 @@ namespace MyGUI {
 		if (ImGui::Begin("Information"), nullptr, windowFlags) {
 			ImGui::Text("Welcome to my Calculator!");
 			ImGui::Spacing();
-			ImGui::Text("using imgui ver %s %d", IMGUI_VERSION, IMGUI_VERSION_NUM);
-			ImGui::Spacing();
 			ImGui::Checkbox("Start Calculator", &startCalc);
+			ImGui::Spacing();
+			ImGui::Text("using imgui ver %s %d", IMGUI_VERSION, IMGUI_VERSION_NUM);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+			ImGui::Spacing();
 			if (startCalc) {
-				RenderMain(workPosx, workPosy, io);
+				RenderMain(workPosx, workPosy);
 			}
 		}
 		ImGui::End();

@@ -57,7 +57,7 @@ int main(int, char**)
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    ImFont* defaultFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 18.0f);
+    ImFont* defaultFont = io.Fonts->AddFontFromFileTTF("..\\CalcGUI\\misc\\fonts\\RedditMono-VariableFont_wght.ttf", 17.0f);
     //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
@@ -117,11 +117,6 @@ int main(int, char**)
         ImGui::NewFrame();
 
         // *** MY CODE ***
-        // Extra styling
-        // TODO: figure out how to change global (or try to change individual windows) imgui font
-       /* ImFont* pFont = io.Fonts->AddFontFromFileTTF("../vendor/imgui/misc/fonts/Karla-Regular.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesDefault());
-        IM_ASSERT(pFont != nullptr);
-        io.FontDefault = pFont;*/
 
         // Load main windows
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
