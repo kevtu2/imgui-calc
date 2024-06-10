@@ -1,7 +1,4 @@
 ﻿#include "Application.h"
-#include "imgui.h"
-#include <cstring>
-#include <iostream>
 
 namespace MyGUI {
 	static bool startCalc = false;
@@ -24,25 +21,30 @@ namespace MyGUI {
 			//ImGui::PopFont(); // Pop title font
 			//ImGui::PushFont(bodyFont); // Use body font
 
-			// Tool tip - Calculator description
-			ImGui::TextDisabled("(?)");
-			if (ImGui::IsItemHovered()) {
-				ImGui::BeginTooltip();
-				ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-				ImGui::TextUnformatted("This is the beginning of the calculator app.");
-				ImGui::PopTextWrapPos();
-				ImGui::EndTooltip();
-			}
+			//// Tool tip - Calculator description
+			//ImGui::TextDisabled("(?)");
+			//if (ImGui::IsItemHovered()) {
+			//	ImGui::BeginTooltip();
+			//	ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			//	ImGui::TextUnformatted("This is the beginning of the calculator app.");
+			//	ImGui::PopTextWrapPos();
+			//	ImGui::EndTooltip();
+			//}
 
-			// Calculator input box
-			static char input[256] = "";
+			// Calculator operation text box
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
+			static char current[256] = "";
+			ImGui::InputTextMultiline("##Operation", current, IM_ARRAYSIZE(current), ImVec2(408, 20), inputFlags);
 
+			// Calculator input box
+			static char input[256] = "0";
 			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(408, 100), inputFlags);
+
 			ImGui::Spacing();
 
 			ImGui::BeginDisabled(strlen(input) >= 54);
+
 			// CALCULATOR LAYOUT:
 			const char* buttons[6][4] = {
 				{"cos","sin", "tan","Clr"},
@@ -53,32 +55,50 @@ namespace MyGUI {
 				{"0",  ".",  "(-)", "="	 }
 			};
 
+			// Calculator Logic
+			static Calculator calc;
+			static bool firstClear = true;
+
 			// Load buttons
 			for (int row = 0; row < 6; ++row) {
 				for (int col = 0; col < 4; ++col) {
 					{ // Specific shading for different buttons/operations
 						if (row == 0 || row == 1 || col == 3) {
+							// Row/Col specific highlighting
 							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
 							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 
 							if (buttons[row][col] == "=") {
+								// Highlight "=" button
 								style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.85f);
 								style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 							}
-						}
-						else {
+						} else {
 							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
-
 						}
 					}
-					// Loads the actual button itself
-					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) strcat_s(input, buttons[row][col]);
+					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) {
+						if (row >= 2 && col == 3) {
+							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted.
+							strcpy_s(current, input);
+							strcat_s(current, buttons[row][col]);
+							strcpy_s(input, calc.parse(current));
+							firstClear = true;
+						} else if (firstClear){
+							firstClear = false;
+							strcpy_s(input, "");
+							strcat_s(input, buttons[row][col]);
+						} else {
+							strcat_s(input, buttons[row][col]);
+						}
+					}
 					ImGui::SameLine();
 				}
 				ImGui::Spacing();
 				ImGui::Spacing();
 			}
+
 			ImGui::EndDisabled();
 		}
 		ImGui::End();
@@ -86,7 +106,6 @@ namespace MyGUI {
 	}
 	
 	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) {
-
 		// Information window dimensions
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 20), (workPosy + 30)), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(360, 140), ImGuiCond_Always);

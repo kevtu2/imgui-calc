@@ -1,5 +1,8 @@
+## General
 reference/
 .vs/
+
+## Build artifacts
 Calculator.sln
 bin/
 binint/
@@ -7,3 +10,6 @@ CalcGUI/CalcGUI.vcxproj
 CalcGUI/CalcGUI.vcxproj.*
 Calculator/Calculator.vcxproj
 Calculator/Calculator.vcxproj.*
+
+## Imgui artifacts
+CalcGUI/imgui.ini

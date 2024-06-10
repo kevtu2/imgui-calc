@@ -18,7 +18,7 @@ project "CalcGUI"
         "vendor/imgui/backends/imgui_impl_win32.h",
         "vendor/imgui/misc/debuggers/imgui.natvis",
         "vendor/imgui/misc/debuggers/imgui.natstepfilter",
-        "vendor/imgui/misc/cpp/imgui_stdlib.*",
+        "vendor/imgui/misc/cpp/imgui_stdlib.*"
     }
 
     includedirs {
@@ -26,12 +26,14 @@ project "CalcGUI"
         "vendor/imgui",
         "vendor/imgui/backends",
         "vendor/imgui/misc/cpp/",
+        "../Calculator/include/"
     }
 
     links { 
         "d3d11",
         "dxgi",
-        "d3dcompiler"
+        "d3dcompiler",
+        "Calculator"
     }
 
     filter { "configurations:Debug" }
