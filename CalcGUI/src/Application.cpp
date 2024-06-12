@@ -18,24 +18,12 @@ namespace MyGUI {
 
 		// Make calculator window
 		if (ImGui::Begin("Calculator", &startCalc, windowFlags)) {
-			//ImGui::PopFont(); // Pop title font
-			//ImGui::PushFont(bodyFont); // Use body font
 
-			//// Tool tip - Calculator description
-			//ImGui::TextDisabled("(?)");
-			//if (ImGui::IsItemHovered()) {
-			//	ImGui::BeginTooltip();
-			//	ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			//	ImGui::TextUnformatted("This is the beginning of the calculator app.");
-			//	ImGui::PopTextWrapPos();
-			//	ImGui::EndTooltip();
-			//}
-
-			// Calculator operation text box
+			// Math expression display variables - Displays current operations.
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
-			static char current[256] = "";
-			ImGui::InputTextMultiline("##Operation", current, IM_ARRAYSIZE(current), ImVec2(408, 20), inputFlags);
+			static char expression[256] = ""; // Expression to display
+			ImGui::InputTextMultiline("##Operation", expression, IM_ARRAYSIZE(expression), ImVec2(408, 20), inputFlags);
 
 			// Calculator input box
 			static char input[256] = "0";
@@ -55,8 +43,9 @@ namespace MyGUI {
 				{"0",  ".",  "(-)", "="	 }
 			};
 
-			// Calculator Logic
+			// For calculator logic (class)
 			static Calculator calc;
+			static char current[256] = ""; // Current expression to calculate
 			static bool firstClear = true;
 
 			// Load buttons
@@ -80,15 +69,30 @@ namespace MyGUI {
 					}
 					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) {
 						if (row >= 2 && col == 3) {
-							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted.
+							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted
+							// For display
+							(buttons[row][col] == "=") ? strcat_s(expression, input) : strcpy_s(expression, input);
+							strcat_s(expression, buttons[row][col]);
+
+							// For calculations
 							strcpy_s(current, input);
 							strcat_s(current, buttons[row][col]);
 							strcpy_s(input, calc.parse(current));
 							firstClear = true;
-						} else if (firstClear){
+
+						} else if (firstClear && buttons[row][col] != "Clr") {
 							firstClear = false;
 							strcpy_s(input, "");
 							strcat_s(input, buttons[row][col]);
+
+						} else if (buttons[row][col] == "Del") {
+							calc.del(input);
+
+						} else if (buttons[row][col] == "Clr") {
+							calc.clr();
+							expression[0] = '\0';
+							strcpy_s(input, "0");
+
 						} else {
 							strcat_s(input, buttons[row][col]);
 						}
@@ -114,7 +118,7 @@ namespace MyGUI {
 
 		// Make info window
 		if (ImGui::Begin("Information"), nullptr, windowFlags) {
-			ImGui::Text("Welcome to my Calculator!");
+			ImGui::Text("Welcome to my Calculator");
 			ImGui::Spacing();
 			ImGui::Checkbox("Start Calculator", &startCalc);
 			ImGui::Spacing();

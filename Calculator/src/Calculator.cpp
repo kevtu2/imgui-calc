@@ -1,7 +1,4 @@
 #include "Calculator.h"
-#include <iostream>
-
-// TODO: Utilize std::vector for multiple operands. Need to be able to parse through input string to find the different operands.
 
 Calculator::Calculator() : results{ 0 }, isDouble{ false }, firstOp{ true }, divByZero{ false }, op{ '=' } {} // Default ctor
 
@@ -75,4 +72,18 @@ const char* Calculator::calculate(double operand) {
 	}
 	snprintf(buffer, sizeof(buffer), "%.15f", this->results);
 	return buffer;
+}
+
+const char* Calculator::del(char input[]) {
+	input[strlen(input) - 1] = '\0';
+	return input;
+}
+
+void Calculator::clr() {
+	this->results = 0;
+	this->isDouble = false;
+	this->firstOp = true;
+	this->divByZero = false;
+	this->op = '=';
+
 }

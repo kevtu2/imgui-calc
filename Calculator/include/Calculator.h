@@ -7,11 +7,10 @@ class Calculator {
 private:
 	double results;
 	char op;
-	bool firstOp;
 	bool isDouble;
 	bool divByZero;
+	bool firstOp;
 
-	//void del()
 	void add(double input);
 	void sub(double input);
 	void multiply(double input);
@@ -21,4 +20,6 @@ private:
 public:
 	Calculator();
 	const char* parse(char input[]);
+	const char* del(char input[]);
+	void clr();
 };
