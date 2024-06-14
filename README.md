@@ -1,2 +1,2 @@
-# graphing-calc
-A graphing calculator application that utilizes the power of Dear ImGui 
+# imgui-calc
+A simple calculator application that utilizes the power of Dear ImGui as the frontend. 
