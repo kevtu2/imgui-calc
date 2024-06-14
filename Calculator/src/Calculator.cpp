@@ -17,6 +17,8 @@ void Calculator::divide(double input) {
 		this->divByZero = true;
 		return;
 	}
+	if ((int)this->results % (int)input != 0) this->isDouble = true;
+	else this->isDouble = false;
 	this->results = (double)(this->results / input);
 }
 
@@ -51,8 +53,13 @@ const char* Calculator::calculate(double operand) {
 	char buffer[256];
 	switch (this->op) {
 	case '=':
-		snprintf(buffer, sizeof(buffer), "%.15f", this->results);
-		return buffer;
+		if (this->isDouble) {
+			snprintf(buffer, sizeof(buffer), "%.6f", this->results);
+			return buffer;
+		} else {
+			snprintf(buffer, sizeof(buffer), "%.0f", this->results);
+			return buffer;
+		}
 	case '+':
 		add(operand);
 		break;
@@ -70,8 +77,14 @@ const char* Calculator::calculate(double operand) {
 		}
 		break;
 	}
-	snprintf(buffer, sizeof(buffer), "%.15f", this->results);
-	return buffer;
+	if (this->isDouble) {
+		snprintf(buffer, sizeof(buffer), "%.6f", this->results);
+		return buffer;
+	}
+	else {
+		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
+		return buffer;
+	}
 }
 
 const char* Calculator::del(char input[]) {

@@ -1,4 +1,5 @@
 // Dear ImGui: standalone example application for DirectX 11
+// Main backend application
 
 // Learn about Dear ImGui:
 // - FAQ                  https://dearimgui.com/faq
@@ -34,7 +35,7 @@ int main(int, char**)
     //ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Calculator v1.0.1", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Calculator v1.0.1", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 825, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd))

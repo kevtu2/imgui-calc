@@ -1,7 +1,10 @@
 ﻿#include "Application.h"
 
 namespace MyGUI {
-	static bool startCalc = false;
+	static bool show_app_calculator = false;
+	static bool show_window_precision = false;
+	static bool show_window_help = false;
+	static bool app_exit = false;
 
 	void RenderMain(float workPosx, float workPosy) {
 
@@ -9,15 +12,31 @@ namespace MyGUI {
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280-500), (workPosy + 50)), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(424, 689), ImGuiCond_Always); // W,H
+		ImGui::SetNextWindowSize(ImVec2(424, 715), ImGuiCond_Always); // W,H
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
 		windowFlags |= ImGuiWindowFlags_NoResize;
 		windowFlags |= ImGuiWindowFlags_NoScrollbar;
 		windowFlags |= ImGuiWindowFlags_NoScrollWithMouse;
+		windowFlags |= ImGuiWindowFlags_MenuBar;
 
 		// Make calculator window
-		if (ImGui::Begin("Calculator", &startCalc, windowFlags)) {
+		if (ImGui::Begin("Calculator", &show_app_calculator, windowFlags)) {
+
+			{ // Settings menu bar
+				if (ImGui::BeginMenuBar()) {
+					if (ImGui::BeginMenu("Settings")) {
+						ImGui::MenuItem("Help", NULL, &show_window_help);
+						ImGui::MenuItem("Set Precision", NULL, &show_window_precision);
+						ImGui::MenuItem("Quit", "Alt+F4", &app_exit);
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenuBar();
+				}
+				/*if (show_window_help) {
+
+				}*/
+			}
 
 			// Math expression display variables - Displays current operations.
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
@@ -35,8 +54,8 @@ namespace MyGUI {
 
 			// CALCULATOR LAYOUT:
 			const char* buttons[6][4] = {
-				{"cos","sin", "tan","Clr"},
-				{"sqr","sqrt","/",  "Del"},
+				{"cos","sin", "Del","Clr"},
+				{"sqr","sqrt","Pow","/"  },
 				{"7",  "8",  "9",   "*"	 },
 				{"4",  "5",  "6",   "-"	 },
 				{"1",  "2",  "3",   "+"	 },
@@ -68,9 +87,10 @@ namespace MyGUI {
 						}
 					}
 					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) {
-						if (row >= 2 && col == 3) {
+						if (row >= 1 && col == 3) {
 							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted
-							// For display
+
+							// For displaying only
 							(buttons[row][col] == "=") ? strcat_s(expression, input) : strcpy_s(expression, input);
 							strcat_s(expression, buttons[row][col]);
 
@@ -78,7 +98,11 @@ namespace MyGUI {
 							strcpy_s(current, input);
 							strcat_s(current, buttons[row][col]);
 							strcpy_s(input, calc.parse(current));
+							
+							// Used to reset upon next input
+							if (buttons[row][col] == "=") calc.clr();
 							firstClear = true;
+							// TODO: Valid input - Spamming operator buttons will cause rapid overflow.
 
 						} else if (firstClear && buttons[row][col] != "Clr") {
 							firstClear = false;
@@ -92,6 +116,7 @@ namespace MyGUI {
 							calc.clr();
 							expression[0] = '\0';
 							strcpy_s(input, "0");
+							firstClear = true;
 
 						} else {
 							strcat_s(input, buttons[row][col]);
@@ -109,6 +134,10 @@ namespace MyGUI {
 		return;
 	}
 	
+	/*static void ShowHelpWindow(bool* p_open) {
+
+	}*/
+
 	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) {
 		// Information window dimensions
 		ImGui::SetNextWindowPos(ImVec2((workPosx + 20), (workPosy + 30)), ImGuiCond_Always);
@@ -120,12 +149,12 @@ namespace MyGUI {
 		if (ImGui::Begin("Information"), nullptr, windowFlags) {
 			ImGui::Text("Welcome to my Calculator");
 			ImGui::Spacing();
-			ImGui::Checkbox("Start Calculator", &startCalc);
+			ImGui::Checkbox("Start Calculator", &show_app_calculator);
 			ImGui::Spacing();
 			ImGui::Text("using imgui ver %s %d", IMGUI_VERSION, IMGUI_VERSION_NUM);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 			ImGui::Spacing();
-			if (startCalc) {
+			if (show_app_calculator) {
 				RenderMain(workPosx, workPosy);
 			}
 		}
