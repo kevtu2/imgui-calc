@@ -1,9 +1,9 @@
 #include "Calculator.h"
 
-Calculator::Calculator() : results{ 0 }, isDouble{ false }, firstOp{ true }, divByZero{ false }, op{ '=' } {} // Default ctor
+Calculator::Calculator() : results{ 0 }, op{ '=' }, precision{ 6 }, isDouble{ false }, divByZero{ false }, firstOp{ true } {} 
 
 void Calculator::add(double input) {
-	this->results += input;
+	this->results += input; 
 }
 void Calculator::sub(double input) {
 	this->results -= input;
@@ -78,10 +78,9 @@ const char* Calculator::calculate(double operand) {
 		break;
 	}
 	if (this->isDouble) {
-		snprintf(buffer, sizeof(buffer), "%.6f", this->results);
+		snprintf(buffer, sizeof(buffer), "%.*f", this->precision, this->results);
 		return buffer;
-	}
-	else {
+	} else {
 		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
 		return buffer;
 	}
@@ -98,5 +97,10 @@ void Calculator::clr() {
 	this->firstOp = true;
 	this->divByZero = false;
 	this->op = '=';
+	return;
+}
 
+void Calculator::set_precision(unsigned int x) {
+	this->precision = x;
+	return;
 }

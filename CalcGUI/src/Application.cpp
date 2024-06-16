@@ -1,10 +1,43 @@
 ﻿#include "Application.h"
 
 namespace MyGUI {
+	// Window Flags
 	static bool show_app_calculator = false;
 	static bool show_window_precision = false;
-	static bool show_window_help = false;
-	static bool app_exit = false;
+	static bool show_window_about = false;
+
+	// For calculator logic (class)
+	static Calculator calc;
+	static char current[256] = ""; // Current expression to calculate
+	static bool firstClear = true;
+
+	static void ShowPrecisionWindow(bool* p_open, Calculator& calc) {
+		if (!ImGui::Begin("Set Floating Point Precision", p_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::End();
+			return;
+		}
+		static int x1 = 0;
+		ImGui::SliderInt("Set Precision", &x1, 0, 12);
+		calc.set_precision(x1);
+		ImGui::End();
+		return;
+	}
+
+	static void ShowAboutWindow(bool* p_open) {
+		if (!ImGui::Begin("About", p_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::End();
+			return;
+		}
+		ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+		ImGui::Text("By Omar Cornut and all Dear ImGui contributors.");
+		ImGui::Text("Dear ImGui is licensed under the MIT License, see LICENSE for more information.");
+		ImGui::Separator();
+		ImGui::Text("Thank you for using my simple calculator.");
+		ImGui::Text("The making of this app was primarily for learning Dear ImGui and to experiment with its various features.");
+		ImGui::Text("Please check out the Dear ImGui repo for more information about the framework.");
+		ImGui::Text("- Kevin Tu");
+		ImGui::End();
+	}
 
 	void RenderMain(float workPosx, float workPosy) {
 
@@ -26,16 +59,14 @@ namespace MyGUI {
 			{ // Settings menu bar
 				if (ImGui::BeginMenuBar()) {
 					if (ImGui::BeginMenu("Settings")) {
-						ImGui::MenuItem("Help", NULL, &show_window_help);
 						ImGui::MenuItem("Set Precision", NULL, &show_window_precision);
-						ImGui::MenuItem("Quit", "Alt+F4", &app_exit);
+						ImGui::MenuItem("About", "(?)", &show_window_about);
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenuBar();
 				}
-				/*if (show_window_help) {
-
-				}*/
+				if (show_window_precision) ShowPrecisionWindow(&show_window_precision, calc);
+				if (show_window_about) ShowAboutWindow(&show_window_about);
 			}
 
 			// Math expression display variables - Displays current operations.
@@ -62,10 +93,7 @@ namespace MyGUI {
 				{"0",  ".",  "(-)", "="	 }
 			};
 
-			// For calculator logic (class)
-			static Calculator calc;
-			static char current[256] = ""; // Current expression to calculate
-			static bool firstClear = true;
+			// TODO: Add history to view previous calculations.
 
 			// Load buttons
 			for (int row = 0; row < 6; ++row) {
@@ -102,7 +130,7 @@ namespace MyGUI {
 							// Used to reset upon next input
 							if (buttons[row][col] == "=") calc.clr();
 							firstClear = true;
-							// TODO: Valid input - Spamming operator buttons will cause rapid overflow.
+							// FIXME: Valid & Invalid input - Spamming operator buttons will cause rapid overflow.
 
 						} else if (firstClear && buttons[row][col] != "Clr") {
 							firstClear = false;
@@ -133,10 +161,6 @@ namespace MyGUI {
 		ImGui::End();
 		return;
 	}
-	
-	/*static void ShowHelpWindow(bool* p_open) {
-
-	}*/
 
 	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) {
 		// Information window dimensions
@@ -154,10 +178,10 @@ namespace MyGUI {
 			ImGui::Text("using imgui ver %s %d", IMGUI_VERSION, IMGUI_VERSION_NUM);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 			ImGui::Spacing();
-			if (show_app_calculator) {
-				RenderMain(workPosx, workPosy);
-			}
 		}
+
+		if (show_app_calculator) RenderMain(workPosx, workPosy);
+
 		ImGui::End();
 		return;
 	}

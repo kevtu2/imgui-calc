@@ -7,6 +7,7 @@ class Calculator {
 private:
 	double results;
 	char op;
+	unsigned int precision;
 	bool isDouble;
 	bool divByZero;
 	bool firstOp;
@@ -22,4 +23,5 @@ public:
 	const char* parse(char input[]);
 	const char* del(char input[]);
 	void clr();
+	void set_precision(unsigned int x);
 };
