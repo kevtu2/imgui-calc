@@ -1,6 +1,6 @@
 #include "Calculator.h"
 
-Calculator::Calculator() : results{ 0 }, op{ '=' }, precision{ 6 }, isDouble{ false }, divByZero{ false }, firstOp{ true } {} 
+Calculator::Calculator() : results{ 0 }, op{ '=' }, precision{ 12 }, isDouble{ false }, divByZero{ false }, firstOp{ true }, sendEquals{ false }, calculated{ false } {}
 
 void Calculator::add(double input) {
 	this->results += input; 
@@ -25,7 +25,10 @@ void Calculator::divide(double input) {
 const char* Calculator::parse(char input[]) {
 	static char tempOperand[256] = "";
 	memset(tempOperand, 0, sizeof(tempOperand));
-
+	if (this->sendEquals) {
+		this->op = '=';
+		this->calculate(0);
+	}
 	for (unsigned int i = 0; i < strlen(input); ++i) {
 		if (input[i] == '.') this->isDouble = true;
 
@@ -41,6 +44,7 @@ const char* Calculator::parse(char input[]) {
 				return tempOperand;
 			} else {
 				const char* result = calculate(atof(tempOperand));
+				this->calculated = true;
 				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
 				this->op = input[i];
 				return tempOperand;
@@ -49,17 +53,22 @@ const char* Calculator::parse(char input[]) {
 	}
 }
 
+void Calculator::get_results(char (&buffer)[256]) {
+	if (this->isDouble) {
+		snprintf(buffer, sizeof(buffer), "%.6f", this->results);
+	} else {
+		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
+	}
+	return;
+}
+
 const char* Calculator::calculate(double operand) {
 	char buffer[256];
 	switch (this->op) {
 	case '=':
-		if (this->isDouble) {
-			snprintf(buffer, sizeof(buffer), "%.6f", this->results);
-			return buffer;
-		} else {
-			snprintf(buffer, sizeof(buffer), "%.0f", this->results);
-			return buffer;
-		}
+		get_results(buffer);
+		this->sendEquals = true;
+		return buffer;
 	case '+':
 		add(operand);
 		break;
@@ -77,13 +86,8 @@ const char* Calculator::calculate(double operand) {
 		}
 		break;
 	}
-	if (this->isDouble) {
-		snprintf(buffer, sizeof(buffer), "%.*f", this->precision, this->results);
-		return buffer;
-	} else {
-		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
-		return buffer;
-	}
+	get_results(buffer);
+	return buffer;
 }
 
 const char* Calculator::del(char input[]) {
@@ -96,6 +100,7 @@ void Calculator::clr() {
 	this->isDouble = false;
 	this->firstOp = true;
 	this->divByZero = false;
+	this->sendEquals = false;
 	this->op = '=';
 	return;
 }
@@ -104,3 +109,4 @@ void Calculator::set_precision(unsigned int x) {
 	this->precision = x;
 	return;
 }
+
