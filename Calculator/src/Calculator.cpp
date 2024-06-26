@@ -101,6 +101,7 @@ void Calculator::clr() {
 	this->firstOp = true;
 	this->divByZero = false;
 	this->sendEquals = false;
+	this->calculated = false;
 	this->op = '=';
 	return;
 }

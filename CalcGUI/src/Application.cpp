@@ -9,9 +9,9 @@ namespace MyGUI {
 
 	// For calculator logic (class)
 	static Calculator calc;
-	static char current[256] = ""; // Current expression to calculate
-	static char history[256] = ""; // Displays previous calculation
-	static char equation[256] = ""; // Contains the entire equation that was calculated.
+	static char calculate_exp[256] = ""; // Current expression to calculate
+	static char history_exp[256] = ""; // Displays previous calculation(s)
+	static char equation_exp[256] = ""; // Contains the entire equation that was calculated.
 	static bool firstClear = true;
 	static bool firstCalc = false;
 
@@ -42,7 +42,8 @@ namespace MyGUI {
 			ImGui::End();
 			return;
 		}
-		ImGui::Text(history);
+		if (ImGui::Button("Clear History")) history_exp[0] = '\0';
+		ImGui::Text(history_exp);
 		ImGui::End();
 	}
 
@@ -64,6 +65,14 @@ namespace MyGUI {
 		ImGui::Text("- Kevin Tu");
 		ImGui::End();
 	}
+
+	/*void GrowString(char(&str)[256]) {
+		char* newStr = new char[strlen(str) * 2];
+		for (int i = 0; i < strlen(str), ++i) {
+			newStr[i] = str[i];
+		}
+		
+	}*/
 
 	void RenderMain(float workPosx, float workPosy) {
 		
@@ -104,8 +113,8 @@ namespace MyGUI {
 			// Math expression display variables - Displays current operations.
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
-			static char expression[256] = ""; // Expression to display
-			ImGui::InputTextMultiline("##Operation", expression, IM_ARRAYSIZE(expression), ImVec2(408, 20), inputFlags);
+			static char display_exp[256] = ""; // Expression to display
+			ImGui::InputTextMultiline("##Operation", display_exp, IM_ARRAYSIZE(display_exp), ImVec2(408, 20), inputFlags);
 
 			// Calculator input box
 			static char input[256] = "0";
@@ -117,7 +126,7 @@ namespace MyGUI {
 
 			if (strlen(input) >= 54) {
 				calc.clr();
-				expression[0] = '\0';
+				display_exp[0] = '\0';
 				strcpy_s(input, "Overflow!");
 				firstClear = true;
 			}
@@ -156,35 +165,47 @@ namespace MyGUI {
 						if (row >= 1 && col == 3) {
 							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted
 
+							// TODO: Add dynamically growing C string for history_exp.
+							/*if (strlen(history_exp) == 256) GrowString(history_exp);*/
+
 							// For displaying only
-							//(buttons[row][col] == "=") ? strcat_s(expression, input) : strcpy_s(expression, input);
-							if (buttons[row][col] == "=") strcat_s(expression, input);
-							else if (!calc.calculated) {
-								strcpy_s(expression, input);
-								strcat_s(expression, buttons[row][col]);
-								strcpy_s(current, input);
-								strcat_s(current, buttons[row][col]);
-								strcpy_s(input, calc.parse(current));
+							//(buttons[row][col] == "=") ? strcat_s(display_exp, input) : strcpy_s(display_exp, input);
+							if (buttons[row][col] == "=") {
+								strcat_s(display_exp, input);
+								strcat_s(display_exp, buttons[row][col]);
+								strcpy_s(calculate_exp, input);
+								strcat_s(calculate_exp, buttons[row][col]);
+								strcpy_s(input, calc.parse(calculate_exp));
+								calc.calculated = false;
+
+							} else if (!calc.calculated) {
+								strcpy_s(equation_exp, display_exp);
+								strcat_s(equation_exp, input); // Used for history
+								strcpy_s(display_exp, input);
+								strcat_s(display_exp, buttons[row][col]);
+								strcpy_s(calculate_exp, input);
+								strcat_s(calculate_exp, buttons[row][col]);
+								strcpy_s(input, calc.parse(calculate_exp));
 							}
 
 							if (calc.calculated) {
-								calc.get_results(expression);
-								strcat_s(expression, buttons[row][col]);
-								strcpy_s(current, input);
-								strcat_s(current, buttons[row][col]);
+								calc.get_results(display_exp);
+								strcat_s(equation_exp, "=");
+								strcat_s(equation_exp, display_exp);
+								strcat_s(display_exp, buttons[row][col]);
+								strcpy_s(calculate_exp, display_exp);
 								calc.calculated = false;
+								strcat_s(history_exp, equation_exp);
+								strcat_s(history_exp, "\n");
+								equation_exp[0] = '\0';
 							}
-							
-							// For history
-							strcat_s(equation, current); // Concatenate expression
-							
+						
 							// Used to reset upon next input
 							if (buttons[row][col] == "=") {
 								calc.clr();
-								strcat_s(equation, input); // Concatenate answer
-								strcpy_s(history, equation);
-								strcat_s(equation, "\n");
-								calc.calculated = false;
+								strcat_s(history_exp, display_exp); // Concatenate expression e.g, 7*3=
+								strcat_s(history_exp, input); // Concatenate answer e.g, 7*3=21
+								strcat_s(history_exp, "\n");
 							}
 							firstClear = true;
 
@@ -198,8 +219,8 @@ namespace MyGUI {
 
 						} else if (buttons[row][col] == "Clr") {
 							calc.clr();
-							expression[0] = '\0';
-							equation[0] = '\0';
+							display_exp[0] = '\0';
+							equation_exp[0] = '\0';
 							strcpy_s(input, "0");
 							firstClear = true;
 							firstCalc = false;
