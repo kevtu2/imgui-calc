@@ -124,12 +124,12 @@ namespace MyGUI {
 
 			// CALCULATOR LAYOUT:
 			const char* buttons[6][4] = {
-				{"cos","sin", "Del","Clr"},
-				{"sqr","sqrt","Pow","/"  },
-				{"7",  "8",  "9",   "*"	 },
-				{"4",  "5",  "6",   "-"	 },
-				{"1",  "2",  "3",   "+"	 },
-				{"0",  ".",  "(-)", "="	 }
+				{"sqr","sqrt","Del","Clr" },
+				{"sin","cos","tan", "/"   },
+				{"7",  "8",  "9",   "*"	  },
+				{"4",  "5",  "6",   "-"	  },
+				{"1",  "2",  "3",   "+"	  },
+				{"0",  ".",  "(-)", "="	  }
 			};
 
 			// Load buttons
@@ -161,15 +161,19 @@ namespace MyGUI {
 							if (buttons[row][col] == "=") strcat_s(expression, input);
 							else if (!calc.calculated) {
 								strcpy_s(expression, input);
-							} else {
-								calc.get_results(expression);
-								calc.calculated = false;
+								strcat_s(expression, buttons[row][col]);
+								strcpy_s(current, input);
+								strcat_s(current, buttons[row][col]);
+								strcpy_s(input, calc.parse(current));
 							}
 
-							strcat_s(expression, buttons[row][col]);
-							strcpy_s(current, input);
-							strcat_s(current, buttons[row][col]);
-							strcpy_s(input, calc.parse(current));
+							if (calc.calculated) {
+								calc.get_results(expression);
+								strcat_s(expression, buttons[row][col]);
+								strcpy_s(current, input);
+								strcat_s(current, buttons[row][col]);
+								calc.calculated = false;
+							}
 							
 							// For history
 							strcat_s(equation, current); // Concatenate expression

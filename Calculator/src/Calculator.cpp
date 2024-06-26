@@ -55,7 +55,7 @@ const char* Calculator::parse(char input[]) {
 
 void Calculator::get_results(char (&buffer)[256]) {
 	if (this->isDouble) {
-		snprintf(buffer, sizeof(buffer), "%.6f", this->results);
+		snprintf(buffer, sizeof(buffer), "%.*f", this->precision, this->results);
 	} else {
 		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
 	}
