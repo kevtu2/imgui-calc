@@ -54,7 +54,7 @@ namespace MyGUI {
 			ImGui::End();
 			return;
 		}
-		ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+		ImGui::Text("Dear ImGui %s (%d), DirectX11 Backend", IMGUI_VERSION, IMGUI_VERSION_NUM);
 		ImGui::Text("By Omar Cornut and all Dear ImGui contributors.");
 		ImGui::Text("Dear ImGui is licensed under the MIT License, see LICENSE for more information.");
 		ImGui::Separator();
@@ -230,7 +230,7 @@ namespace MyGUI {
 			ImGui::Spacing();
 			ImGui::Checkbox("Start Calculator", &show_app_calculator);
 			ImGui::Spacing();
-			ImGui::Text("using imgui ver %s %d", IMGUI_VERSION, IMGUI_VERSION_NUM);
+			ImGui::Text("using imgui ver %s %d DirectX11", IMGUI_VERSION, IMGUI_VERSION_NUM);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 			ImGui::Spacing();
 		}
