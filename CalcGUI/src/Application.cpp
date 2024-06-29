@@ -10,10 +10,15 @@ namespace MyGUI {
 	// For calculator logic (class)
 	static Calculator calc;
 	static char calculate_exp[256] = ""; // Current expression to calculate
-	static char history_exp[256] = ""; // Displays previous calculation(s)
+
+	static size_t str_size = 256;
+	static char* history_exp = new char[str_size]();
+
 	static char equation_exp[256] = ""; // Contains the entire equation that was calculated.
 	static bool firstClear = true;
 	static bool firstCalc = false;
+	static bool equalPress = false;
+
 
 
 	static void ShowPrecisionWindow(bool* p_open, Calculator& calc) {
@@ -60,22 +65,23 @@ namespace MyGUI {
 		ImGui::Text("Dear ImGui is licensed under the MIT License, see LICENSE for more information.");
 		ImGui::Separator();
 		ImGui::Text("Thank you for using my simple calculator.");
-		ImGui::Text("The making of this app was primarily for learning Dear ImGui and to experiment with its features.");
 		ImGui::Text("Please check out the Dear ImGui repo for more information about the framework.");
 		ImGui::Text("- Kevin Tu");
 		ImGui::End();
 	}
 
-	/*void GrowString(char(&str)[256]) {
-		char* newStr = new char[strlen(str) * 2];
-		for (int i = 0; i < strlen(str), ++i) {
-			newStr[i] = str[i];
-		}
-		
-	}*/
+	void GrowString(char* (&str)) {
+		size_t new_size = str_size * 2;
+		char* newStr = new char[new_size];
+		for (size_t i = 0; i < strlen(str); ++i) newStr[i] = str[i];
+		newStr[strlen(str)] = '\0';
+		delete[] str;
+		str = newStr;
+		str_size = new_size;
+	}
 
 	void RenderMain(float workPosx, float workPosy) {
-		
+
 		// For styling
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -165,20 +171,19 @@ namespace MyGUI {
 						if (row >= 1 && col == 3) {
 							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted
 
-							// TODO: Add dynamically growing C string for history_exp.
-							/*if (strlen(history_exp) == 256) GrowString(history_exp);*/
-
 							// For displaying only
 							//(buttons[row][col] == "=") ? strcat_s(display_exp, input) : strcpy_s(display_exp, input);
-							if (buttons[row][col] == "=") {
+							// TODO: Refactor this section of code (disgusting ew).
+							if (buttons[row][col] == "=" && !equalPress) {
 								strcat_s(display_exp, input);
 								strcat_s(display_exp, buttons[row][col]);
 								strcpy_s(calculate_exp, input);
 								strcat_s(calculate_exp, buttons[row][col]);
 								strcpy_s(input, calc.parse(calculate_exp));
 								calc.calculated = false;
+								equalPress = true;
 
-							} else if (!calc.calculated) {
+							} else if (!calc.calculated && !equalPress) {
 								strcpy_s(equation_exp, display_exp);
 								strcat_s(equation_exp, input); // Used for history
 								strcpy_s(display_exp, input);
@@ -195,17 +200,24 @@ namespace MyGUI {
 								strcat_s(display_exp, buttons[row][col]);
 								strcpy_s(calculate_exp, display_exp);
 								calc.calculated = false;
-								strcat_s(history_exp, equation_exp);
-								strcat_s(history_exp, "\n");
+
+								if ((strlen(equation_exp) + strlen(history_exp) + 1) >= str_size - 1) GrowString(history_exp);
+								strcat_s(history_exp, str_size, equation_exp);
+								strcat_s(history_exp, str_size, "\n");
 								equation_exp[0] = '\0';
 							}
-						
+							
+							
 							// Used to reset upon next input
+							size_t histsize = strlen(history_exp);
+							size_t displaysize = strlen(display_exp);
+							size_t inputsize = strlen(input);
+							if ((histsize + displaysize + inputsize + 1) >= str_size - 1) GrowString(history_exp);
 							if (buttons[row][col] == "=") {
 								calc.clr();
-								strcat_s(history_exp, display_exp); // Concatenate expression e.g, 7*3=
-								strcat_s(history_exp, input); // Concatenate answer e.g, 7*3=21
-								strcat_s(history_exp, "\n");
+								strcat_s(history_exp, str_size, display_exp); // Concatenate expression e.g, 7*3=
+								strcat_s(history_exp, str_size, input); // Concatenate answer e.g, 7*3=21
+								strcat_s(history_exp, str_size,  "\n");
 							}
 							firstClear = true;
 
@@ -224,6 +236,7 @@ namespace MyGUI {
 							strcpy_s(input, "0");
 							firstClear = true;
 							firstCalc = false;
+							equalPress = false;
 
 						} else {
 							strcat_s(input, buttons[row][col]);
