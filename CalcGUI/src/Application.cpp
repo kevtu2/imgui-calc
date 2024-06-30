@@ -3,7 +3,7 @@
 namespace MyGUI {
 	// Window Flags
 	static bool show_app_calculator = false;
-	static bool show_window_precision = false;
+	static bool show_window_mode = false;
 	static bool show_window_history = false;
 	static bool show_window_about = false;
 
@@ -14,29 +14,20 @@ namespace MyGUI {
 	static size_t str_size = 256;
 	static char* history_exp = new char[str_size]();
 
+	// for the calculator input/answer box
+	static char input[256] = "0"; // Used for displaying the answer and the number to be used as input operands.
+
+	// for the calculator expression box - Displays the current expression that the user inputs.
+	static char display_exp[256] = ""; // Expression to display
+
 	static char equation_exp[256] = ""; // Contains the entire equation that was calculated.
 	static bool firstClear = true;
 	static bool firstCalc = false;
 	static bool equalPress = false;
+	static bool isDouble = false;
 
 
-
-	static void ShowPrecisionWindow(bool* p_open, Calculator& calc) {
-		// Logic for showing precision settings window
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize;
-		windowFlags |= ImGuiWindowFlags_NoCollapse;
-		if (!ImGui::Begin("Set Floating Point Precision", p_open, windowFlags)) {
-			ImGui::End();
-			return;
-		}
-		static int x1 = 0;
-		ImGui::SliderInt("Set Precision (default 12)", &x1, 0, 12);
-		calc.set_precision(x1);
-		ImGui::End();
-		return;
-	}
-
-	static void ShowHistoryWindow(bool* p_open, Calculator& calc) {
+	static void ShowHistoryWindow(bool* p_open) {
 		// Logic for displaying calculation history
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_HorizontalScrollbar;
 		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
@@ -80,6 +71,17 @@ namespace MyGUI {
 		str_size = new_size;
 	}
 
+	void clear_inputs() {
+		calc.clr();
+		display_exp[0] = '\0';
+		equation_exp[0] = '\0';
+		strcpy_s(input, "0");
+		firstClear = true;
+		firstCalc = false;
+		equalPress = false;
+		isDouble = false;
+	}
+
 	void RenderMain(float workPosx, float workPosy) {
 
 		// For styling
@@ -100,18 +102,52 @@ namespace MyGUI {
 			{ // Settings menu bar
 				if (ImGui::BeginMenuBar()) {
 					if (ImGui::BeginMenu("Settings")) {
+
+						if (ImGui::BeginMenu("Mode")) {
+
+							ImGui::TextDisabled("(?)");
+							if (ImGui::IsItemHovered()) {
+								ImGui::BeginTooltip();
+								ImGui::TextUnformatted("DEFAULTS:");
+								ImGui::BulletText("Floating Point: 12 decimal places");
+								ImGui::BulletText("Trigonometry Angle: radians");
+								ImGui::EndTooltip();
+							}
+
+							// Logic for floating point precision
+							ImGui::Text("Set Float Precision");
+							static int x1 = 12;
+							ImGui::SliderInt("##Float", &x1, 0, 12);
+							calc.set_precision(x1);
+							ImGui::Separator();
+
+							// Logic for trigonometry settings
+							if (ImGui::TreeNode("Trigonometry")) {
+								static int selected = -1;
+								static const char* modes[2] = { "Degrees", "Radians" };
+								for (int n = 0; n < 2; ++n) {
+									if (ImGui::Selectable(modes[n], selected == n)) {
+										selected = n;
+										calc.set_trig(selected);
+									}
+								}
+								// Toggles radians or degrees.
+								ImGui::TreePop();
+							}
+
+							ImGui::EndMenu();
+						}
+						
 						ImGui::MenuItem("History", NULL, &show_window_history);
-						ImGui::MenuItem("Set Precision", NULL, &show_window_precision);
 						ImGui::MenuItem("About", "(?)", &show_window_about);
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenuBar();
 				}
-				if (show_window_precision) ShowPrecisionWindow(&show_window_precision, calc);
 				if (show_window_history) {
 					ImGui::SetNextWindowPos(ImVec2((workPosx + 458), (workPosy + 50)), ImGuiCond_Always);
 					ImGui::SetNextWindowSize(ImVec2(324, 715), ImGuiCond_Always);
-					ShowHistoryWindow(&show_window_history, calc);
+					ShowHistoryWindow(&show_window_history);
 				}
 				if (show_window_about) ShowAboutWindow(&show_window_about);
 			}
@@ -119,11 +155,9 @@ namespace MyGUI {
 			// Math expression display variables - Displays current operations.
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
-			static char display_exp[256] = ""; // Expression to display
 			ImGui::InputTextMultiline("##Operation", display_exp, IM_ARRAYSIZE(display_exp), ImVec2(408, 20), inputFlags);
 
-			// Calculator input box
-			static char input[256] = "0";
+			// Calculator input/answer box
 			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(408, 100), inputFlags);
 
 			ImGui::Spacing();
@@ -168,11 +202,27 @@ namespace MyGUI {
 					}
 					// Primary logic for calculator buttons
 					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) {
-						if (row >= 1 && col == 3) {
-							// Operator buttons - Need to execute calculation immediately after 2nd operand is inputted
+
+
+						// Clears current screen to allow next input upon pressing equals sign.
+						if (equalPress) clear_inputs();
+
+						if (buttons[row][col] == "(-)") {
+							char buffer[256];
+							double temp_input = atof(input);
+							temp_input *= -1;
+							if (isDouble) {
+								snprintf(buffer, sizeof(buffer), "%.*f", calc.get_precision(), temp_input);
+							}
+							else {
+								snprintf(buffer, sizeof(buffer), "%.0f", temp_input);
+							}
+							strcpy_s(input, buffer);
+
+						} else if (row >= 1 && col == 3 || row == 1 && col <= 2) {
+							// Operator buttons & Trig functions - Need to execute calculation immediately after 2nd operand is inputted
 
 							// For displaying only
-							//(buttons[row][col] == "=") ? strcat_s(display_exp, input) : strcpy_s(display_exp, input);
 							// TODO: Refactor this section of code (disgusting ew).
 							if (buttons[row][col] == "=" && !equalPress) {
 								strcat_s(display_exp, input);
@@ -186,11 +236,28 @@ namespace MyGUI {
 							} else if (!calc.calculated && !equalPress) {
 								strcpy_s(equation_exp, display_exp);
 								strcat_s(equation_exp, input); // Used for history
-								strcpy_s(display_exp, input);
-								strcat_s(display_exp, buttons[row][col]);
-								strcpy_s(calculate_exp, input);
-								strcat_s(calculate_exp, buttons[row][col]);
-								strcpy_s(input, calc.parse(calculate_exp));
+								if (row == 1 && col <= 2) {
+									// Specific to trig functions - Need to immediately calculate trig_func(current_input)
+									calc.trig = true;
+
+									// Expressions to display logic below need to be changed so it displays sin(75)= for example.
+									strcat_s(display_exp, buttons[row][col]);
+									strcat_s(display_exp, "(");
+									strcat_s(display_exp, input);
+									strcat_s(display_exp, ")");
+									
+									strcpy_s(calculate_exp, input);
+									strcat_s(calculate_exp, buttons[row][col]);
+									strcpy_s(input, calc.parse(calculate_exp));
+
+								} else {
+									strcpy_s(display_exp, input);
+									strcat_s(display_exp, buttons[row][col]);
+									strcpy_s(calculate_exp, input);
+									strcat_s(calculate_exp, buttons[row][col]);
+									strcpy_s(input, calc.parse(calculate_exp));
+								}
+								
 							}
 
 							if (calc.calculated) {
@@ -207,12 +274,12 @@ namespace MyGUI {
 								equation_exp[0] = '\0';
 							}
 							
-							
-							// Used to reset upon next input
 							size_t histsize = strlen(history_exp);
 							size_t displaysize = strlen(display_exp);
 							size_t inputsize = strlen(input);
 							if ((histsize + displaysize + inputsize + 1) >= str_size - 1) GrowString(history_exp);
+
+							// Used to reset upon next input
 							if (buttons[row][col] == "=") {
 								calc.clr();
 								strcat_s(history_exp, str_size, display_exp); // Concatenate expression e.g, 7*3=
@@ -230,14 +297,18 @@ namespace MyGUI {
 							calc.del(input);
 
 						} else if (buttons[row][col] == "Clr") {
-							calc.clr();
-							display_exp[0] = '\0';
-							equation_exp[0] = '\0';
-							strcpy_s(input, "0");
-							firstClear = true;
-							firstCalc = false;
-							equalPress = false;
+							clear_inputs();
 
+						} else if (buttons[row][col] == "." && !isDouble) {
+							// Concatenate decimal point only once.
+							isDouble = true;
+							strcat_s(input, buttons[row][col]);
+
+						}
+						else if (row == 1 && col <= 2) {
+							// These are the trig function buttons
+							double tempInput = atof(input);
+							/*calc.trig(buttons[row][col], tempInput);*/
 						} else {
 							strcat_s(input, buttons[row][col]);
 						}
