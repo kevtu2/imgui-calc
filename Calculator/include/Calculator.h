@@ -1,5 +1,8 @@
 #pragma once
 #include <cstring>
+#include <string>
+#include <iomanip>
+#include <sstream>
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -8,7 +11,7 @@
 class Calculator {
 private:
 	double results;
-	char op[5];
+	std::string op;
 	unsigned int precision;
 	bool isDouble;
 	bool divByZero;
@@ -23,16 +26,16 @@ private:
 	void sine(double input);
 	void cosine(double input);
 	void tangent(double input);
-	const char* calculate(double operand);
-	void build_operator(char* input, unsigned int i);
+	void parse2(std::string& tempOperand);
+	std::string calculate(double operand);
 
 public:
 	bool calculated;
 	bool trig;
 	Calculator();
-	const char* parse(char input[]);
-	void get_results(char(&buffer)[256]);
-	const char* del(char input[]);
+	std::string parse(std::string input);
+	void get_results(std::string &buffer);
+	std::string del(std::string input);
 	void clr();
 	void set_precision(unsigned int x);
 	unsigned int get_precision();
