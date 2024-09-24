@@ -1,19 +1,27 @@
 #include "Calculator.h"
 
-Calculator::Calculator() : results{ 0 }, op{ "=" }, precision{12}, isDouble{false}, divByZero{false},
-firstOp{ true }, sendEquals{ false }, calculated{ false }, radians{ true }, trig{ false } {}
+Calculator::Calculator() : results{ 0 }, op{ "=" }, 
+precision{12}, isDouble{false}, 
+divByZero{false}, firstOp{ true }, 
+sendEquals{ false }, calculated{ false }, 
+radians{ true }, trig{ false } {}
 
-void Calculator::add(double input) {
+void Calculator::add(double input) 
+{
 	this->results += input; 
 }
-void Calculator::sub(double input) {
+void Calculator::sub(double input) 
+{
 	this->results -= input;
 }
-void Calculator::multiply(double input) {
+void Calculator::multiply(double input) 
+{
 	this->results *= input;
 }
-void Calculator::divide(double input) {
-	if (input == 0) {
+void Calculator::divide(double input) 
+{
+	if (input == 0) 
+	{
 		// Division by 0
 		this->divByZero = true;
 		return;
@@ -24,35 +32,43 @@ void Calculator::divide(double input) {
 }
 
 
-void Calculator::sine(double input) {
+void Calculator::sine(double input) 
+{
 	this->results = std::sin(input);
 }
 
-void Calculator::cosine(double input) {
+void Calculator::cosine(double input) 
+{
 	this->results = std::cos(input);
 }
 
-void Calculator::tangent(double input) {
+void Calculator::tangent(double input) 
+{
 	this->results = std::tan(input);
 }
 
-const char* Calculator::parse(char input[]) {
+const char* Calculator::parse(char input[]) 
+{
 	static char tempOperand[256] = "";
 	memset(tempOperand, 0, sizeof(tempOperand));
 	/*if (this->sendEquals) {
 		this->op = '=';
 		this->calculate(0);
 	}*/
-	for (unsigned int i = 0; i < strlen(input); ++i) {
+	for (unsigned int i = 0; i < strlen(input); ++i) 
+	{
 		if (input[i] == '.') this->isDouble = true;
 
-		if (input[i] >= '0' && input[i] <= '9' || input[i] == '.' || input[0] == '-') {
+		if (input[i] >= '0' && input[i] <= '9' || input[i] == '.' || input[0] == '-') 
+		{
 			// Build the operand
 			tempOperand[i] = input[i];
-		} else {
+		} else 
+		{
 			tempOperand[strlen(tempOperand)] = '\0';
 
-			if (this->trig) {
+			if (this->trig) 
+			{
 				build_operator(input, i);
 				this->isDouble = true;
 				
@@ -66,13 +82,17 @@ const char* Calculator::parse(char input[]) {
 				this->isDouble = false;
 
 
-			} else if (this->firstOp) {
+			} 
+			else if (this->firstOp) 
+			{
 				this->results = atof(tempOperand);
 				this->firstOp = false;
 				// Builds operator (for case testing)
 				build_operator(input, i);
 
-			} else {
+			} 
+			else 
+			{
 				const char* result = calculate(atof(tempOperand));
 				this->calculated = true;
 				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
@@ -84,7 +104,8 @@ const char* Calculator::parse(char input[]) {
 	}
 }
 
-void Calculator::get_results(char (&buffer)[256]) {
+void Calculator::get_results(char (&buffer)[256]) 
+{
 	// Formats the answer in the form of a C-String to be displayed via ImGui
 	if (this->isDouble) {
 		snprintf(buffer, sizeof(buffer), "%.*f", this->precision, this->results);
@@ -94,9 +115,11 @@ void Calculator::get_results(char (&buffer)[256]) {
 	return;
 }
 
-const char* Calculator::calculate(double operand) {
+const char* Calculator::calculate(double operand) 
+{
 	char buffer[256];
-	switch ((this->op)[0]) {
+	switch ((this->op)[0]) 
+	{
 	case '=':
 		get_results(buffer);
 		this->sendEquals = true;
@@ -112,7 +135,8 @@ const char* Calculator::calculate(double operand) {
 		break;
 	case '/':
 		divide(operand);
-		if (this->divByZero) {
+		if (this->divByZero) 
+		{
 			this->divByZero = false;
 			return "Undefined";
 		}
@@ -128,22 +152,26 @@ const char* Calculator::calculate(double operand) {
 	return buffer;
 }
 
-void Calculator::build_operator(char* input, unsigned int i) {
+void Calculator::build_operator(char* input, unsigned int i) 
+{
 	// Extracts the operator or math function to be used in calculation
 	unsigned int j = i;
-	for (; j < strlen(input); ++j) {
+	for (; j < strlen(input); ++j) 
+	{
 		(this->op)[j - i] = input[j];
 	}
 	this->op[j - i] = '\0';
 	return;
 }
 
-const char* Calculator::del(char input[]) {
+const char* Calculator::del(char input[]) 
+{
 	input[strlen(input) - 1] = '\0';
 	return input;
 }
 
-void Calculator::clr() {
+void Calculator::clr() 
+{
 	this->results = 0;
 	this->isDouble = false;
 	this->firstOp = true;
@@ -155,16 +183,19 @@ void Calculator::clr() {
 	return;
 }
 
-void Calculator::set_precision(unsigned int x) {
+void Calculator::set_precision(unsigned int x) 
+{
 	this->precision = x;
 	return;
 }
 
-unsigned int Calculator::get_precision() {
+unsigned int Calculator::get_precision() 
+{
 	return this->precision;
 }
 
-void Calculator::set_trig(int selection) {
+void Calculator::set_trig(int selection) 
+{
 	if (selection == 0) this->radians = false;
 	else this->radians = true;
 	return;

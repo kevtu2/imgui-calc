@@ -27,14 +27,16 @@ namespace MyGUI {
 	static bool isDouble = false;
 
 
-	static void ShowHistoryWindow(bool* p_open) {
+	static void ShowHistoryWindow(bool* p_open) 
+	{
 		// Logic for displaying calculation history
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_HorizontalScrollbar;
 		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 		windowFlags |= ImGuiWindowFlags_NoCollapse;
 		windowFlags |= ImGuiWindowFlags_NoResize;
 
-		if (!ImGui::Begin("History", p_open, windowFlags)) {
+		if (!ImGui::Begin("History", p_open, windowFlags)) 
+		{
 			ImGui::End();
 			return;
 		}
@@ -43,11 +45,13 @@ namespace MyGUI {
 		ImGui::End();
 	}
 
-	static void ShowAboutWindow(bool* p_open) {
+	static void ShowAboutWindow(bool* p_open) 
+	{
 		// Logic for showing the about window - details about the application
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_AlwaysAutoResize;
 		windowFlags |= ImGuiWindowFlags_NoCollapse;
-		if (!ImGui::Begin("About", p_open, windowFlags)) {
+		if (!ImGui::Begin("About", p_open, windowFlags)) 
+		{
 			ImGui::End();
 			return;
 		}
@@ -61,7 +65,8 @@ namespace MyGUI {
 		ImGui::End();
 	}
 
-	void GrowString(char* (&str)) {
+	void GrowString(char* (&str)) 
+	{
 		size_t new_size = str_size * 2;
 		char* newStr = new char[new_size];
 		for (size_t i = 0; i < strlen(str); ++i) newStr[i] = str[i];
@@ -71,7 +76,8 @@ namespace MyGUI {
 		str_size = new_size;
 	}
 
-	void clear_inputs() {
+	void clear_inputs() 
+	{
 		calc.clr();
 		display_exp[0] = '\0';
 		equation_exp[0] = '\0';
@@ -82,12 +88,13 @@ namespace MyGUI {
 		isDouble = false;
 	}
 
-	void RenderMain(float workPosx, float workPosy) {
+	void RenderMain(float workPosx, float workPosy) 
+	{
 
 		// For styling
 		ImGuiStyle& style = ImGui::GetStyle();
 
-		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280-500), (workPosy + 50)), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2((workPosx + 1280 - 500), (workPosy + 50)), ImGuiCond_Always);
 		ImGui::SetNextWindowSize(ImVec2(424, 715), ImGuiCond_Always); // W,H
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
@@ -97,16 +104,20 @@ namespace MyGUI {
 		windowFlags |= ImGuiWindowFlags_MenuBar;
 
 		// Make calculator window
-		if (ImGui::Begin("Calculator", &show_app_calculator, windowFlags)) {
+		if (ImGui::Begin("Calculator", &show_app_calculator, windowFlags)) 
+		{
 
 			{ // Settings menu bar
-				if (ImGui::BeginMenuBar()) {
-					if (ImGui::BeginMenu("Settings")) {
+				if (ImGui::BeginMenuBar()) 
+				{
+					if (ImGui::BeginMenu("Settings")) 
+					{
 
-						if (ImGui::BeginMenu("Mode")) {
-
+						if (ImGui::BeginMenu("Mode")) 
+						{
 							ImGui::TextDisabled("(?)");
-							if (ImGui::IsItemHovered()) {
+							if (ImGui::IsItemHovered()) 
+							{
 								ImGui::BeginTooltip();
 								ImGui::TextUnformatted("DEFAULTS:");
 								ImGui::BulletText("Floating Point: 12 decimal places");
@@ -122,11 +133,14 @@ namespace MyGUI {
 							ImGui::Separator();
 
 							// Logic for trigonometry settings
-							if (ImGui::TreeNode("Trigonometry")) {
+							if (ImGui::TreeNode("Trigonometry")) 
+							{
 								static int selected = -1;
 								static const char* modes[2] = { "Degrees", "Radians" };
-								for (int n = 0; n < 2; ++n) {
-									if (ImGui::Selectable(modes[n], selected == n)) {
+								for (int n = 0; n < 2; ++n) 
+								{
+									if (ImGui::Selectable(modes[n], selected == n)) 
+									{
 										selected = n;
 										calc.set_trig(selected);
 									}
@@ -137,14 +151,15 @@ namespace MyGUI {
 
 							ImGui::EndMenu();
 						}
-						
+
 						ImGui::MenuItem("History", NULL, &show_window_history);
 						ImGui::MenuItem("About", "(?)", &show_window_about);
 						ImGui::EndMenu();
 					}
 					ImGui::EndMenuBar();
 				}
-				if (show_window_history) {
+				if (show_window_history) 
+				{
 					ImGui::SetNextWindowPos(ImVec2((workPosx + 458), (workPosy + 50)), ImGuiCond_Always);
 					ImGui::SetNextWindowSize(ImVec2(324, 715), ImGuiCond_Always);
 					ShowHistoryWindow(&show_window_history);
@@ -164,7 +179,8 @@ namespace MyGUI {
 
 			ImGui::BeginDisabled(strlen(input) >= 54);
 
-			if (strlen(input) >= 54) {
+			if (strlen(input) >= 54) 
+			{
 				calc.clr();
 				display_exp[0] = '\0';
 				strcpy_s(input, "Overflow!");
@@ -172,7 +188,8 @@ namespace MyGUI {
 			}
 
 			// CALCULATOR LAYOUT:
-			const char* buttons[6][4] = {
+			const char* buttons[6][4] = 
+			{
 				{"sqr","sqrt","Del","Clr" },
 				{"sin","cos","tan", "/"   },
 				{"7",  "8",  "9",   "*"	  },
@@ -182,49 +199,62 @@ namespace MyGUI {
 			};
 
 			// Load buttons
-			for (int row = 0; row < 6; ++row) {
-				for (int col = 0; col < 4; ++col) {
+			for (int row = 0; row < 6; ++row) 
+			{
+				for (int col = 0; col < 4; ++col) 
+				{
 					{ // Specifies shading depending on buttons/operations
-						if (row == 0 || row == 1 || col == 3) {
+						if (row == 0 || row == 1 || col == 3) 
+						{
 							// Row/Col specific highlighting
 							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
 							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 
-							if (buttons[row][col] == "=") {
+							if (buttons[row][col] == "=") 
+							{
 								// Highlight "=" button
 								style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.85f);
 								style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 							}
-						} else {
+						}
+						else 
+						{
 							style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 							style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.60f);
 						}
 					}
 					// Primary logic for calculator buttons
-					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) {
+					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) 
+					{
 
 
 						// Clears current screen to allow next input upon pressing equals sign.
 						if (equalPress) clear_inputs();
 
-						if (buttons[row][col] == "(-)") {
+						if (buttons[row][col] == "(-)") 
+						{
 							char buffer[256];
 							double temp_input = atof(input);
 							temp_input *= -1;
-							if (isDouble) {
+							if (isDouble) 
+							{
 								snprintf(buffer, sizeof(buffer), "%.*f", calc.get_precision(), temp_input);
 							}
-							else {
+							else 
+							{
 								snprintf(buffer, sizeof(buffer), "%.0f", temp_input);
 							}
 							strcpy_s(input, buffer);
 
-						} else if (row >= 1 && col == 3 || row == 1 && col <= 2) {
+						}
+						else if (row >= 1 && col == 3 || row == 1 && col <= 2) 
+						{
 							// Operator buttons & Trig functions - Need to execute calculation immediately after 2nd operand is inputted
 
 							// For displaying only
 							// TODO: Refactor this section of code (disgusting ew).
-							if (buttons[row][col] == "=" && !equalPress) {
+							if (buttons[row][col] == "=" && !equalPress) 
+							{
 								strcat_s(display_exp, input);
 								strcat_s(display_exp, buttons[row][col]);
 								strcpy_s(calculate_exp, input);
@@ -233,10 +263,13 @@ namespace MyGUI {
 								calc.calculated = false;
 								equalPress = true;
 
-							} else if (!calc.calculated && !equalPress) {
+							}
+							else if (!calc.calculated && !equalPress) 
+							{
 								strcpy_s(equation_exp, display_exp);
 								strcat_s(equation_exp, input); // Used for history
-								if (row == 1 && col <= 2) {
+								if (row == 1 && col <= 2) 
+								{
 									// Specific to trig functions - Need to immediately calculate trig_func(current_input)
 									calc.trig = true;
 
@@ -245,22 +278,25 @@ namespace MyGUI {
 									strcat_s(display_exp, "(");
 									strcat_s(display_exp, input);
 									strcat_s(display_exp, ")");
-									
+
 									strcpy_s(calculate_exp, input);
 									strcat_s(calculate_exp, buttons[row][col]);
 									strcpy_s(input, calc.parse(calculate_exp));
 
-								} else {
+								}
+								else 
+								{
 									strcpy_s(display_exp, input);
 									strcat_s(display_exp, buttons[row][col]);
 									strcpy_s(calculate_exp, input);
 									strcat_s(calculate_exp, buttons[row][col]);
 									strcpy_s(input, calc.parse(calculate_exp));
 								}
-								
+
 							}
 
-							if (calc.calculated) {
+							if (calc.calculated) 
+							{
 								calc.get_results(display_exp);
 								strcat_s(equation_exp, "=");
 								strcat_s(equation_exp, display_exp);
@@ -273,43 +309,55 @@ namespace MyGUI {
 								strcat_s(history_exp, str_size, "\n");
 								equation_exp[0] = '\0';
 							}
-							
+
 							size_t histsize = strlen(history_exp);
 							size_t displaysize = strlen(display_exp);
 							size_t inputsize = strlen(input);
 							if ((histsize + displaysize + inputsize + 1) >= str_size - 1) GrowString(history_exp);
 
 							// Used to reset upon next input
-							if (buttons[row][col] == "=") {
+							if (buttons[row][col] == "=") 
+							{
 								calc.clr();
 								strcat_s(history_exp, str_size, display_exp); // Concatenate expression e.g, 7*3=
 								strcat_s(history_exp, str_size, input); // Concatenate answer e.g, 7*3=21
-								strcat_s(history_exp, str_size,  "\n");
+								strcat_s(history_exp, str_size, "\n");
 							}
 							firstClear = true;
 
-						} else if (firstClear && buttons[row][col] != "Clr") {
+						}
+						else if (firstClear && buttons[row][col] != "Clr") 
+						{
 							firstClear = false;
 							strcpy_s(input, "");
 							strcat_s(input, buttons[row][col]);
 
-						} else if (buttons[row][col] == "Del") {
+						}
+						else if (buttons[row][col] == "Del") 
+						{
 							calc.del(input);
 
-						} else if (buttons[row][col] == "Clr") {
+						}
+						else if (buttons[row][col] == "Clr") 
+						{
 							clear_inputs();
 
-						} else if (buttons[row][col] == "." && !isDouble) {
+						}
+						else if (buttons[row][col] == "." && !isDouble) 
+						{
 							// Concatenate decimal point only once.
 							isDouble = true;
 							strcat_s(input, buttons[row][col]);
 
 						}
-						else if (row == 1 && col <= 2) {
+						else if (row == 1 && col <= 2) 
+						{
 							// These are the trig function buttons
 							double tempInput = atof(input);
 							/*calc.trig(buttons[row][col], tempInput);*/
-						} else {
+						}
+						else 
+						{
 							strcat_s(input, buttons[row][col]);
 						}
 					}
@@ -324,7 +372,8 @@ namespace MyGUI {
 		return;
 	}
 
-	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) {
+	void RenderInfo(float workPosx, float workPosy, ImGuiIO& io) 
+	{
 		// Global window dimensions
 
 		// Information window dimensions
@@ -334,7 +383,8 @@ namespace MyGUI {
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoResize;
 
 		// Make info window
-		if (ImGui::Begin("Information"), nullptr, windowFlags) {
+		if (ImGui::Begin("Information"), nullptr, windowFlags) 
+		{
 			ImGui::Text("Welcome to my Calculator");
 			ImGui::Spacing();
 			ImGui::Checkbox("Start Calculator", &show_app_calculator);
