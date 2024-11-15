@@ -8,56 +8,56 @@ radians{ true }, trig{ false } {}
 
 void Calculator::add(double input) 
 {
-	this->results += input; 
+	results += input; 
 }
 void Calculator::sub(double input) 
 {
-	this->results -= input;
+	results -= input;
 }
 void Calculator::multiply(double input) 
 {
-	this->results *= input;
+	results *= input;
 }
 void Calculator::divide(double input) 
 {
 	if (input == 0) 
 	{
 		// Division by 0
-		this->divByZero = true;
+		divByZero = true;
 		return;
 	}
-	if ((int)this->results % (int)input != 0) this->isDouble = true;
-	else this->isDouble = false;
-	this->results = (double)(this->results / input);
+	if ((int)results % (int)input != 0) isDouble = true;
+	else isDouble = false;
+	results = (double)(results / input);
 }
 
 
 void Calculator::sine(double input) 
 {
-	this->results = std::sin(input);
+	results = std::sin(input);
 }
 
 void Calculator::cosine(double input) 
 {
-	this->results = std::cos(input);
+	results = std::cos(input);
 }
 
 void Calculator::tangent(double input) 
 {
-	this->results = std::tan(input);
+	results = std::tan(input);
 }
 
 const char* Calculator::parse(char input[]) 
 {
 	static char tempOperand[256] = "";
 	memset(tempOperand, 0, sizeof(tempOperand));
-	/*if (this->sendEquals) {
-		this->op = '=';
-		this->calculate(0);
+	/*if (sendEquals) {
+		op = '=';
+		calculate(0);
 	}*/
 	for (unsigned int i = 0; i < strlen(input); ++i) 
 	{
-		if (input[i] == '.') this->isDouble = true;
+		if (input[i] == '.') isDouble = true;
 
 		if (input[i] >= '0' && input[i] <= '9' || input[i] == '.' || input[0] == '-') 
 		{
@@ -67,26 +67,26 @@ const char* Calculator::parse(char input[])
 		{
 			tempOperand[strlen(tempOperand)] = '\0';
 
-			if (this->trig) 
+			if (trig) 
 			{
 				build_operator(input, i);
-				this->isDouble = true;
+				isDouble = true;
 				
 				// Converts input to radians if necessary.
-				if (!this->radians) snprintf(tempOperand, sizeof(tempOperand), "%.15f", atof(tempOperand) * (M_PI / 180.0));
+				if (!radians) snprintf(tempOperand, sizeof(tempOperand), "%.15f", atof(tempOperand) * (M_PI / 180.0));
 				const char* result = calculate(atof(tempOperand));
 				
 				
 				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
-				this->trig = false;
-				this->isDouble = false;
+				trig = false;
+				isDouble = false;
 
 
 			} 
-			else if (this->firstOp) 
+			else if (firstOp) 
 			{
-				this->results = atof(tempOperand);
-				this->firstOp = false;
+				results = atof(tempOperand);
+				firstOp = false;
 				// Builds operator (for case testing)
 				build_operator(input, i);
 
@@ -94,7 +94,7 @@ const char* Calculator::parse(char input[])
 			else 
 			{
 				const char* result = calculate(atof(tempOperand));
-				this->calculated = true;
+				calculated = true;
 				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
 				// Builds operator (for case testing)
 				build_operator(input, i);
@@ -107,10 +107,12 @@ const char* Calculator::parse(char input[])
 void Calculator::get_results(char (&buffer)[256]) 
 {
 	// Formats the answer in the form of a C-String to be displayed via ImGui
-	if (this->isDouble) {
-		snprintf(buffer, sizeof(buffer), "%.*f", this->precision, this->results);
-	} else {
-		snprintf(buffer, sizeof(buffer), "%.0f", this->results);
+	if (isDouble) 
+	{
+		snprintf(buffer, sizeof(buffer), "%.*f", precision, results);
+	} else 
+	{
+		snprintf(buffer, sizeof(buffer), "%.0f", results);
 	}
 	return;
 }
@@ -118,11 +120,11 @@ void Calculator::get_results(char (&buffer)[256])
 const char* Calculator::calculate(double operand) 
 {
 	char buffer[256];
-	switch ((this->op)[0]) 
+	switch ((op)[0]) 
 	{
 	case '=':
 		get_results(buffer);
-		this->sendEquals = true;
+		sendEquals = true;
 		return buffer;
 	case '+':
 		add(operand);
@@ -135,18 +137,18 @@ const char* Calculator::calculate(double operand)
 		break;
 	case '/':
 		divide(operand);
-		if (this->divByZero) 
+		if (divByZero) 
 		{
-			this->divByZero = false;
+			divByZero = false;
 			return "Undefined";
 		}
 		break;
 	}
 
 
-	if (!strcmp(this->op, "sin")) sine(operand);
-	else if (!strcmp(this->op, "cos")) cosine(operand);
-	else if (!strcmp(this->op, "tan")) tangent(operand);
+	if (!strcmp(op, "sin")) sine(operand);
+	else if (!strcmp(op, "cos")) cosine(operand);
+	else if (!strcmp(op, "tan")) tangent(operand);
 
 	get_results(buffer);
 	return buffer;
@@ -158,9 +160,9 @@ void Calculator::build_operator(char* input, unsigned int i)
 	unsigned int j = i;
 	for (; j < strlen(input); ++j) 
 	{
-		(this->op)[j - i] = input[j];
+		(op)[j - i] = input[j];
 	}
-	this->op[j - i] = '\0';
+	op[j - i] = '\0';
 	return;
 }
 
@@ -172,32 +174,32 @@ const char* Calculator::del(char input[])
 
 void Calculator::clr() 
 {
-	this->results = 0;
-	this->isDouble = false;
-	this->firstOp = true;
-	this->divByZero = false;
-	this->sendEquals = false;
-	this->calculated = false;
-	this->trig = false;
-	strcpy_s(this->op, "=");
+	results = 0;
+	isDouble = false;
+	firstOp = true;
+	divByZero = false;
+	sendEquals = false;
+	calculated = false;
+	trig = false;
+	strcpy_s(op, "=");
 	return;
 }
 
 void Calculator::set_precision(unsigned int x) 
 {
-	this->precision = x;
+	precision = x;
 	return;
 }
 
-unsigned int Calculator::get_precision() 
+unsigned int Calculator::get_precision() const
 {
-	return this->precision;
+	return precision;
 }
 
 void Calculator::set_trig(int selection) 
 {
-	if (selection == 0) this->radians = false;
-	else this->radians = true;
+	if (selection == 0) radians = false;
+	else radians = true;
 	return;
 }
 
