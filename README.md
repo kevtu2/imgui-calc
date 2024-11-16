@@ -40,5 +40,5 @@ Enter build target: vs2022
 ```
 
 ## Running the Project
-1. After running ./build.bat, the project can be run inside Visual Studio. A more robust and cross-platform version of the project will be added in the future.
-2. An information and introduction window will popup prompting you to start the calculator.
+1. After running build.py, the project can be run inside Visual Studio. A more robust and cross-platform version of the project will be added in the future.
+3. An information and introduction window will popup prompting you to start the calculator.
