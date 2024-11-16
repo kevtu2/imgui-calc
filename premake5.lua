@@ -1,12 +1,8 @@
 workspace "Calculator"
-    configurations {
-        "Debug",
-        "Release"
-    }
-    platforms {
-        "Win32",
-        "Win64"
-    }
+    configurations { "Debug", "Release" }
+    platforms { "Win32", "Win64", "MacOS", "Linux" }
+
+    -- Windows-specifc filters
     filter { "platforms:Win32" }
         system "Windows"
         architecture "x86"
@@ -14,7 +10,16 @@ workspace "Calculator"
     filter { "platforms:Win64" }
         system "Windows"
         architecture "x86_64"
-    
+
+    -- MacOS-specific filter
+    filter { "platforms:MacOS" }
+        system "MacOSX"
+        architecture "x86_64"
+
+    -- Linux-specific filter
+    filter { "platforms:Linux" }
+        system "Linux"
+        architecture "x86_64"
 
 startproject "Calculator"
 

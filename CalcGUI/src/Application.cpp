@@ -226,8 +226,6 @@ namespace MyGUI {
 					// Primary logic for calculator buttons
 					if (ImGui::Button(buttons[row][col], ImVec2(96, 80))) 
 					{
-
-
 						// Clears current screen to allow next input upon pressing equals sign.
 						if (equalPress) clear_inputs();
 
