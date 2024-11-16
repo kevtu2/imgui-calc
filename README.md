@@ -14,13 +14,14 @@ imgui-calc is a simple calculator application utilizing the [Dear Imgui](https:/
 - No support for square and square root functions
 - Some forms of invalid input (not including division by zero) are not handled
 - Quality of life features such as previous answer (ANS) button have not been implemented
-- No support for MacOS or Linux
+- Limited to rendering via DirectX11
 - Currently limited to running in Visual Studio
 
 ## Getting Started
 ### Prerequisites
 - Windows 10/11
 - DirectX11
+- Python3.10 or newer
 - Microsoft Visual Studio 2022
 
 ### Installation
@@ -32,9 +33,10 @@ git clone https://github.com/kevtu2/imgui-calc.git
 ```markdown
 cd imgui-calc
 ```
-4. Run build.bat:
+3. Run build.py:
 ```markdown
-./build.bat vs2022
+python3 build.py
+Enter build target: vs2022 
 ```
 
 ## Running the Project
