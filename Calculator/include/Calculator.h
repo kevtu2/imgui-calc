@@ -35,6 +35,6 @@ public:
 	const char* del(char input[]);
 	void clr();
 	void set_precision(unsigned int x);
-	unsigned int get_precision();
+	unsigned int get_precision() const;
 	void set_trig(int selection);
 };
