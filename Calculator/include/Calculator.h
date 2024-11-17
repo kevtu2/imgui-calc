@@ -1,11 +1,10 @@
 #pragma once
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
+#include <string>
 #include <cmath>
 #define M_PI 3.14159265358979323846
 
-class Calculator {
+class Calculator 
+{
 private:
 	double results;
 	char op[5];
@@ -31,10 +30,12 @@ public:
 	bool trig;
 	Calculator();
 	const char* parse(char input[]);
-	void get_results(char(&buffer)[256]);
 	const char* del(char input[]);
 	void clr();
+
+	// Getters and setters
 	void set_precision(unsigned int x);
-	unsigned int get_precision() const;
 	void set_trig(int selection);
+	void get_results(char(&buffer)[256]);
+	unsigned int get_precision() const;
 };

@@ -1,8 +1,9 @@
 #include "Calculator.h"
 
-Calculator::Calculator() : results{ 0 }, op{ "=" }, 
-precision{12}, isDouble{false}, 
-divByZero{false}, firstOp{ true }, 
+Calculator::Calculator() : 
+results{ 0 }, op{ "=" }, 
+precision{ 12 }, isDouble{ false }, 
+divByZero{ false }, firstOp{ true }, 
 sendEquals{ false }, calculated{ false }, 
 radians{ true }, trig{ false } {}
 
@@ -49,24 +50,17 @@ void Calculator::tangent(double input)
 
 const char* Calculator::parse(char input[]) 
 {
-	static char tempOperand[256] = "";
-	memset(tempOperand, 0, sizeof(tempOperand));
-	/*if (sendEquals) {
-		op = '=';
-		calculate(0);
-	}*/
-	for (unsigned int i = 0; i < strlen(input); ++i) 
+	std::string temp_operand = "";
+	for (int i = 0; i < input.length(); ++i) 
 	{
 		if (input[i] == '.') isDouble = true;
 
 		if (input[i] >= '0' && input[i] <= '9' || input[i] == '.' || input[0] == '-') 
 		{
 			// Build the operand
-			tempOperand[i] = input[i];
+			tempOperand += input[i];
 		} else 
 		{
-			tempOperand[strlen(tempOperand)] = '\0';
-
 			if (trig) 
 			{
 				build_operator(input, i);

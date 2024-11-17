@@ -9,18 +9,17 @@ namespace MyGUI {
 
 	// For calculator logic (class)
 	static Calculator calc;
-	static char calculate_exp[256] = ""; // Current expression to calculate
+	static std::string calculate_exp = ""; // Current expression to calculate
 
 	static size_t str_size = 256;
-	static char* history_exp = new char[str_size]();
 
 	// for the calculator input/answer box
-	static char input[256] = "0"; // Used for displaying the answer and the number to be used as input operands.
+	static std::string input = "0"; // Used for displaying the answer and the number to be used as input operands.
 
 	// for the calculator expression box - Displays the current expression that the user inputs.
-	static char display_exp[256] = ""; // Expression to display
+	static std::string display_exp = ""; // Expression to display
 
-	static char equation_exp[256] = ""; // Contains the entire equation that was calculated.
+	static std::string equation_exp = ""; // Contains the entire equation that was calculated.
 	static bool firstClear = true;
 	static bool firstCalc = false;
 	static bool equalPress = false;
@@ -79,9 +78,9 @@ namespace MyGUI {
 	void clear_inputs() 
 	{
 		calc.clr();
-		display_exp[0] = '\0';
-		equation_exp[0] = '\0';
-		strcpy_s(input, "0");
+		display_exp.clear();
+		equation_exp.clear();
+		input.assign("0");
 		firstClear = true;
 		firstCalc = false;
 		equalPress = false;
@@ -170,20 +169,32 @@ namespace MyGUI {
 			// Math expression display variables - Displays current operations.
 			ImGuiWindowFlags inputFlags = ImGuiInputTextFlags_ReadOnly;
 			inputFlags |= ImGuiInputTextFlags_NoUndoRedo;
-			ImGui::InputTextMultiline("##Operation", display_exp, IM_ARRAYSIZE(display_exp), ImVec2(408, 20), inputFlags);
+
+			display_exp.resize(256); // MAY CAUSE ISSUES!!!
+			ImGui::InputTextMultiline(
+				"##Operation", 
+				&display_exp[0], 
+				display_exp.size() + 1,
+				ImVec2(408, 20), 
+				inputFlags);
 
 			// Calculator input/answer box
-			ImGui::InputTextMultiline("##Input", input, IM_ARRAYSIZE(input), ImVec2(408, 100), inputFlags);
+			input.resize(54);
+			ImGui::InputTextMultiline(
+				"##Input", 
+				&input[0],
+				input.size() + 1,
+				ImVec2(408, 100), 
+				inputFlags);
 
 			ImGui::Spacing();
 
-			ImGui::BeginDisabled(strlen(input) >= 54);
-
-			if (strlen(input) >= 54) 
+			if (input.length() >= 54)
 			{
+				ImGui::BeginDisabled(true);
 				calc.clr();
-				display_exp[0] = '\0';
-				strcpy_s(input, "Overflow!");
+				display_exp.clear();
+				input.assign("Overflow!");
 				firstClear = true;
 			}
 
@@ -231,19 +242,18 @@ namespace MyGUI {
 
 						if (buttons[row][col] == "(-)") 
 						{
-							char buffer[256];
-							double temp_input = atof(input);
+							std::stringstream ss;
+							double temp_input = (double)std::stof(input);
 							temp_input *= -1;
 							if (isDouble) 
-							{
-								snprintf(buffer, sizeof(buffer), "%.*f", calc.get_precision(), temp_input);
+							{ // TODO: add option to use scientific notation (remove std::fixed)
+								ss << std::fixed << std::setprecision(calc.get_precision()) << temp_input;
 							}
 							else 
 							{
-								snprintf(buffer, sizeof(buffer), "%.0f", temp_input);
+								(int)temp_input;
 							}
-							strcpy_s(input, buffer);
-
+							input.assign(std::to_string(temp_input);
 						}
 						else if (row >= 1 && col == 3 || row == 1 && col <= 2) 
 						{
@@ -253,83 +263,73 @@ namespace MyGUI {
 							// TODO: Refactor this section of code (disgusting ew).
 							if (buttons[row][col] == "=" && !equalPress) 
 							{
-								strcat_s(display_exp, input);
-								strcat_s(display_exp, buttons[row][col]);
-								strcpy_s(calculate_exp, input);
-								strcat_s(calculate_exp, buttons[row][col]);
-								strcpy_s(input, calc.parse(calculate_exp));
+								display_exp += input;
+								display_exp += buttons[row][col];
+								calculate_exp.assign(display_exp);
+								input += calc.parse(calculate_exp);
 								calc.calculated = false;
 								equalPress = true;
-
 							}
 							else if (!calc.calculated && !equalPress) 
 							{
-								strcpy_s(equation_exp, display_exp);
-								strcat_s(equation_exp, input); // Used for history
+								equation_exp.assign(display_exp);
+								equation_exp += input; // Used for history
 								if (row == 1 && col <= 2) 
 								{
 									// Specific to trig functions - Need to immediately calculate trig_func(current_input)
 									calc.trig = true;
 
 									// Expressions to display logic below need to be changed so it displays sin(75)= for example.
-									strcat_s(display_exp, buttons[row][col]);
-									strcat_s(display_exp, "(");
-									strcat_s(display_exp, input);
-									strcat_s(display_exp, ")");
+									display_exp += buttons[row][col];
+									display_exp += "(";
+									display_exp += input;
+									display_exp += ")";
 
-									strcpy_s(calculate_exp, input);
-									strcat_s(calculate_exp, buttons[row][col]);
-									strcpy_s(input, calc.parse(calculate_exp));
+									calculate_exp.assign(input);
+									calculate_exp += buttons[row][col];
+									input.assign(calc.parse(calculate_exp));
 
 								}
 								else 
 								{
-									strcpy_s(display_exp, input);
-									strcat_s(display_exp, buttons[row][col]);
-									strcpy_s(calculate_exp, input);
-									strcat_s(calculate_exp, buttons[row][col]);
-									strcpy_s(input, calc.parse(calculate_exp));
+									display_exp.assign(input);
+									display_exp += buttons[row][col];
+									calculate_exp.copy(display_exp);
+									input.assign(calc.parse(calculate_exp);
 								}
 
 							}
 
-							if (calc.calculated) 
+							if (calc.calculated)
 							{
+								// Display calculated results
 								calc.get_results(display_exp);
-								strcat_s(equation_exp, "=");
-								strcat_s(equation_exp, display_exp);
-								strcat_s(display_exp, buttons[row][col]);
-								strcpy_s(calculate_exp, display_exp);
+								equation_exp += "=";
+								equation_exp += display_exp;
+								display_exp += buttons[row][col];
+								calculate_exp.assign(display_exp);
 								calc.calculated = false;
 
-								if ((strlen(equation_exp) + strlen(history_exp) + 1) >= str_size - 1) GrowString(history_exp);
-								strcat_s(history_exp, str_size, equation_exp);
-								strcat_s(history_exp, str_size, "\n");
-								equation_exp[0] = '\0';
+								// Append to history
+								history_exp += equation_exp;
+								history_exp += '\n';
+								equation_exp.clear();
 							}
-
-							size_t histsize = strlen(history_exp);
-							size_t displaysize = strlen(display_exp);
-							size_t inputsize = strlen(input);
-							if ((histsize + displaysize + inputsize + 1) >= str_size - 1) GrowString(history_exp);
 
 							// Used to reset upon next input
-							if (buttons[row][col] == "=") 
+							if (buttons[row][col] == "=")
 							{
 								calc.clr();
-								strcat_s(history_exp, str_size, display_exp); // Concatenate expression e.g, 7*3=
-								strcat_s(history_exp, str_size, input); // Concatenate answer e.g, 7*3=21
-								strcat_s(history_exp, str_size, "\n");
+								history_exp += display_exp; // Concatenate expression e.g, 7*3=
+								history_exp += input; // Concatenate answer e.g, 7*3=21
+								history_exp += "\n";
 							}
 							firstClear = true;
-
 						}
 						else if (firstClear && buttons[row][col] != "Clr") 
 						{
 							firstClear = false;
-							strcpy_s(input, "");
-							strcat_s(input, buttons[row][col]);
-
+							input.assign(buttons[row][col]);
 						}
 						else if (buttons[row][col] == "Del") 
 						{
@@ -345,18 +345,17 @@ namespace MyGUI {
 						{
 							// Concatenate decimal point only once.
 							isDouble = true;
-							strcat_s(input, buttons[row][col]);
-
+							input.assign(buttons[row][col]);
 						}
 						else if (row == 1 && col <= 2) 
 						{
 							// These are the trig function buttons
-							double tempInput = atof(input);
+							double tempInput = (double)std::stof(input);
 							/*calc.trig(buttons[row][col], tempInput);*/
 						}
 						else 
 						{
-							strcat_s(input, buttons[row][col]);
+							input.assign(buttons[row][col]);
 						}
 					}
 					ImGui::SameLine();

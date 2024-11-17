@@ -14,6 +14,7 @@ def build(action:str):
             subprocess.run([premake5_path, action])
         case "Linux":
             print(f"Building for Linux ({action})..")
+            subprocess.run(["chmod +x ./vendor/bin/premake/premake5.exe"])
             subprocess.run([premake5_path, action])
         case "Darwin": # MacOS
             print(f"Building for MacOS ({action})..")
