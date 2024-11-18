@@ -1,13 +1,15 @@
 #pragma once
 #include <string>
 #include <cmath>
-#define M_PI 3.14159265358979323846
+#include <sstream>
+#include <iomanip>
+constexpr auto M_PI = 3.14159265358979323846;
 
 class Calculator 
 {
 private:
 	double results;
-	char op[5];
+	std::string op;
 	unsigned int precision;
 	bool isDouble;
 	bool divByZero;
@@ -22,20 +24,21 @@ private:
 	void sine(double input);
 	void cosine(double input);
 	void tangent(double input);
-	const char* calculate(double operand);
-	void build_operator(char* input, unsigned int i);
+	std::string calculate(double operand);
+	void build_operator(std::string input, unsigned int i);
 
 public:
 	bool calculated;
 	bool trig;
 	Calculator();
-	const char* parse(char input[]);
-	const char* del(char input[]);
+	std::string parse(std::string);
+	void del(std::string &input);
 	void clr();
 
 	// Getters and setters
 	void set_precision(unsigned int x);
 	void set_trig(int selection);
-	void get_results(char(&buffer)[256]);
+	std::string get_precise(double input);
+	std::string get_results();
 	unsigned int get_precision() const;
 };

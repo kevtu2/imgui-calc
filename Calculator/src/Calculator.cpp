@@ -48,7 +48,7 @@ void Calculator::tangent(double input)
 	results = std::tan(input);
 }
 
-const char* Calculator::parse(char input[]) 
+std::string Calculator::parse(std::string input) 
 {
 	std::string temp_operand = "";
 	for (int i = 0; i < input.length(); ++i) 
@@ -58,7 +58,7 @@ const char* Calculator::parse(char input[])
 		if (input[i] >= '0' && input[i] <= '9' || input[i] == '.' || input[0] == '-') 
 		{
 			// Build the operand
-			tempOperand += input[i];
+			temp_operand += input[i];
 		} else 
 		{
 			if (trig) 
@@ -67,19 +67,22 @@ const char* Calculator::parse(char input[])
 				isDouble = true;
 				
 				// Converts input to radians if necessary.
-				if (!radians) snprintf(tempOperand, sizeof(tempOperand), "%.15f", atof(tempOperand) * (M_PI / 180.0));
-				const char* result = calculate(atof(tempOperand));
+				if (!radians) 
+				{
+					std::stringstream ss;
+					ss << std::fixed << std::setprecision(15) << std::stof(temp_operand)*(M_PI / 180.0);
+					temp_operand.assign(ss.str());
+				}
+				std::string result = calculate(std::stof(temp_operand));
 				
-				
-				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
+				temp_operand.assign(result);
 				trig = false;
 				isDouble = false;
-
 
 			} 
 			else if (firstOp) 
 			{
-				results = atof(tempOperand);
+				results = std::stof(temp_operand);
 				firstOp = false;
 				// Builds operator (for case testing)
 				build_operator(input, i);
@@ -87,83 +90,84 @@ const char* Calculator::parse(char input[])
 			} 
 			else 
 			{
-				const char* result = calculate(atof(tempOperand));
+				std::string result = calculate(std::stof(temp_operand));
 				calculated = true;
-				strncpy_s(tempOperand, sizeof(tempOperand), result, _TRUNCATE);
 				// Builds operator (for case testing)
 				build_operator(input, i);
 			}
-			return tempOperand;
+			return temp_operand;
 		}
 	}
 }
 
-void Calculator::get_results(char (&buffer)[256]) 
-{
-	// Formats the answer in the form of a C-String to be displayed via ImGui
-	if (isDouble) 
-	{
-		snprintf(buffer, sizeof(buffer), "%.*f", precision, results);
-	} else 
-	{
-		snprintf(buffer, sizeof(buffer), "%.0f", results);
+std::string Calculator::get_precise(double input) 
+{	
+	std::stringstream ss;
+	// Formats the answer based on the set precision of the calculator
+	if (isDouble)
+	{ // TODO: add option to use scientific notation (remove std::fixed)
+		ss << std::fixed << std::setprecision(precision) << input;
 	}
-	return;
+	else
+	{
+		(int)input;
+	}
+	return std::to_string(input);
 }
 
-const char* Calculator::calculate(double operand) 
+std::string Calculator::get_results()
 {
-	char buffer[256];
-	switch ((op)[0]) 
+	return std::to_string(results);
+}
+
+
+std::string Calculator::calculate(double operand) 
+{
+	if (op == "=")
 	{
-	case '=':
-		get_results(buffer);
 		sendEquals = true;
-		return buffer;
-	case '+':
+		return get_precise(results);
+	}
+	else if (op == "+")
 		add(operand);
-		break;
-	case '-':
+	else if (op == "-")
 		sub(operand);
-		break;
-	case '*':
+	else if (op == "*")
 		multiply(operand);
-		break;
-	case '/':
+	else if (op == "/")
+	{
 		divide(operand);
-		if (divByZero) 
+		if (divByZero)
 		{
 			divByZero = false;
 			return "Undefined";
 		}
-		break;
 	}
+	else if (op == "sin")
+		sine(operand);
+	else if (op == "cos")
+		cosine(operand);
+	else if (op == "tan")
+		tangent(operand);
 
-
-	if (!strcmp(op, "sin")) sine(operand);
-	else if (!strcmp(op, "cos")) cosine(operand);
-	else if (!strcmp(op, "tan")) tangent(operand);
-
-	get_results(buffer);
-	return buffer;
+	return get_precise(results);
 }
 
-void Calculator::build_operator(char* input, unsigned int i) 
+void Calculator::build_operator(std::string input, unsigned int i) 
 {
 	// Extracts the operator or math function to be used in calculation
 	unsigned int j = i;
-	for (; j < strlen(input); ++j) 
+	for (; j < input.length(); ++j) 
 	{
 		(op)[j - i] = input[j];
 	}
-	op[j - i] = '\0';
 	return;
 }
 
-const char* Calculator::del(char input[]) 
+void Calculator::del(std::string &input) 
 {
-	input[strlen(input) - 1] = '\0';
-	return input;
+	// TODO: Change calls to this function to immediately call std::string::pop_back
+	input.pop_back();
 }
 
 void Calculator::clr() 
@@ -175,7 +179,7 @@ void Calculator::clr()
 	sendEquals = false;
 	calculated = false;
 	trig = false;
-	strcpy_s(op, "=");
+	op.assign("=");
 	return;
 }
 

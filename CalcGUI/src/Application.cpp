@@ -15,7 +15,7 @@ namespace MyGUI {
 
 	// for the calculator input/answer box
 	static std::string input = "0"; // Used for displaying the answer and the number to be used as input operands.
-
+	
 	// for the calculator expression box - Displays the current expression that the user inputs.
 	static std::string display_exp = ""; // Expression to display
 
@@ -24,6 +24,8 @@ namespace MyGUI {
 	static bool firstCalc = false;
 	static bool equalPress = false;
 	static bool isDouble = false;
+
+	static std::string history_exp;
 
 
 	static void ShowHistoryWindow(bool* p_open) 
@@ -39,8 +41,8 @@ namespace MyGUI {
 			ImGui::End();
 			return;
 		}
-		if (ImGui::Button("Clear History")) history_exp[0] = '\0';
-		ImGui::Text(history_exp);
+		if (ImGui::Button("Clear History")) history_exp.clear();
+		ImGui::Text(history_exp.c_str());
 		ImGui::End();
 	}
 
@@ -174,24 +176,26 @@ namespace MyGUI {
 			ImGui::InputTextMultiline(
 				"##Operation", 
 				&display_exp[0], 
-				display_exp.size() + 1,
+				display_exp.capacity(),
 				ImVec2(408, 20), 
 				inputFlags);
+			display_exp.resize(std::strlen(display_exp.c_str()));
 
 			// Calculator input/answer box
 			input.resize(54);
 			ImGui::InputTextMultiline(
 				"##Input", 
 				&input[0],
-				input.size() + 1,
+				input.capacity(),
 				ImVec2(408, 100), 
 				inputFlags);
 
-			ImGui::Spacing();
+			input.resize(std::strlen(input.c_str()));
 
+			ImGui::Spacing();
+			ImGui::BeginDisabled(input.length() >= 54);
 			if (input.length() >= 54)
 			{
-				ImGui::BeginDisabled(true);
 				calc.clr();
 				display_exp.clear();
 				input.assign("Overflow!");
@@ -240,21 +244,9 @@ namespace MyGUI {
 						// Clears current screen to allow next input upon pressing equals sign.
 						if (equalPress) clear_inputs();
 
-						if (buttons[row][col] == "(-)") 
-						{
-							std::stringstream ss;
-							double temp_input = (double)std::stof(input);
-							temp_input *= -1;
-							if (isDouble) 
-							{ // TODO: add option to use scientific notation (remove std::fixed)
-								ss << std::fixed << std::setprecision(calc.get_precision()) << temp_input;
-							}
-							else 
-							{
-								(int)temp_input;
-							}
-							input.assign(std::to_string(temp_input);
-						}
+						if (buttons[row][col] == "(-)")
+							input.insert(input.begin(), '-');
+
 						else if (row >= 1 && col == 3 || row == 1 && col <= 2) 
 						{
 							// Operator buttons & Trig functions - Need to execute calculation immediately after 2nd operand is inputted
@@ -294,8 +286,8 @@ namespace MyGUI {
 								{
 									display_exp.assign(input);
 									display_exp += buttons[row][col];
-									calculate_exp.copy(display_exp);
-									input.assign(calc.parse(calculate_exp);
+									calculate_exp.assign(display_exp);
+									input.assign(calc.parse(calculate_exp));
 								}
 
 							}
@@ -303,7 +295,7 @@ namespace MyGUI {
 							if (calc.calculated)
 							{
 								// Display calculated results
-								calc.get_results(display_exp);
+								display_exp.assign(calc.get_results());
 								equation_exp += "=";
 								equation_exp += display_exp;
 								display_exp += buttons[row][col];
