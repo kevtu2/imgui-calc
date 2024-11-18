@@ -321,7 +321,8 @@ namespace MyGUI {
 						else if (firstClear && buttons[row][col] != "Clr") 
 						{
 							firstClear = false;
-							input.assign(buttons[row][col]);
+							input.clear();
+							input += buttons[row][col];
 						}
 						else if (buttons[row][col] == "Del") 
 						{
@@ -337,7 +338,7 @@ namespace MyGUI {
 						{
 							// Concatenate decimal point only once.
 							isDouble = true;
-							input.assign(buttons[row][col]);
+							input += buttons[row][col];
 						}
 						else if (row == 1 && col <= 2) 
 						{
@@ -347,7 +348,7 @@ namespace MyGUI {
 						}
 						else 
 						{
-							input.assign(buttons[row][col]);
+							input += buttons[row][col];
 						}
 					}
 					ImGui::SameLine();
